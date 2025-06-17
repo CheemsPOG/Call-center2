@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils";
 
 interface LayoutProps {
   children: ReactNode;
+  onLogout?: () => void;
 }
 
 interface Notification {
@@ -49,7 +50,7 @@ interface Notification {
   read: boolean;
 }
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, onLogout }: LayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [agentStatus, setAgentStatus] = useState("available");
@@ -139,11 +140,6 @@ const Layout = ({ children }: LayoutProps) => {
       path: "/settings",
     },
   ];
-
-  const handleLogout = () => {
-    navigate("/login");
-    window.location.reload();
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -259,6 +255,7 @@ const Layout = ({ children }: LayoutProps) => {
             <Button
               variant="ghost"
               className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-gray-700"
+              onClick={onLogout}
             >
               <LogOut className="w-5 h-5 mr-3" />
               Logout

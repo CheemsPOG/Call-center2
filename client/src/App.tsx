@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Login,
   Dashboard,
@@ -20,7 +20,23 @@ import {
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem("isAuthenticated") === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("isAuthenticated", isAuthenticated ? "true" : "false");
+  }, [isAuthenticated]);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem("isAuthenticated", "true");
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem("isAuthenticated");
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -33,7 +49,7 @@ const App = () => {
               path="/login"
               element={
                 !isAuthenticated ? (
-                  <Login onLogin={() => setIsAuthenticated(true)} />
+                  <Login onLogin={handleLogin} />
                 ) : (
                   <Navigate to="/dashboard" />
                 )
@@ -42,32 +58,48 @@ const App = () => {
             <Route
               path="/dashboard"
               element={
-                isAuthenticated ? <Dashboard /> : <Navigate to="/login" />
+                isAuthenticated ? (
+                  <Dashboard onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/employees"
               element={
-                isAuthenticated ? <Employees /> : <Navigate to="/login" />
+                isAuthenticated ? (
+                  <Employees onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/calls"
               element={
-                isAuthenticated ? <CallManagement /> : <Navigate to="/login" />
+                isAuthenticated ? (
+                  <CallManagement onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/calls/:id"
               element={
-                isAuthenticated ? <CallDetails /> : <Navigate to="/login" />
+                isAuthenticated ? (
+                  <CallDetails onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/tickets"
               element={
                 isAuthenticated ? (
-                  <TicketManagement />
+                  <TicketManagement onLogout={handleLogout} />
                 ) : (
                   <Navigate to="/login" />
                 )
@@ -76,19 +108,31 @@ const App = () => {
             <Route
               path="/settings"
               element={
-                isAuthenticated ? <Settings /> : <Navigate to="/login" />
+                isAuthenticated ? (
+                  <Settings onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/analytics"
               element={
-                isAuthenticated ? <Analytics /> : <Navigate to="/login" />
+                isAuthenticated ? (
+                  <Analytics onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/customers/:id"
               element={
-                isAuthenticated ? <CustomerProfile /> : <Navigate to="/login" />
+                isAuthenticated ? (
+                  <CustomerProfile onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route

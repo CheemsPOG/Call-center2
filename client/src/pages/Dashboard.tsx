@@ -22,7 +22,7 @@ import {
   PhoneIncoming,
 } from "lucide-react";
 
-const Dashboard = () => {
+const Dashboard = ({ onLogout }: { onLogout?: () => void }) => {
   const stats = [
     {
       title: "Active Calls",
@@ -109,7 +109,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Layout>
+    <Layout onLogout={onLogout}>
       <div className="space-y-6">
         {/* Header */}
         <div>

@@ -38,7 +38,7 @@ import {
   Eye,
 } from "lucide-react";
 
-const TicketManagement = () => {
+const TicketManagement = ({ onLogout }: { onLogout?: () => void }) => {
   const tickets = [
     {
       id: "TKT-001",
@@ -160,7 +160,7 @@ const TicketManagement = () => {
   };
 
   return (
-    <Layout>
+    <Layout onLogout={onLogout}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">

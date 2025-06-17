@@ -34,7 +34,7 @@ import {
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 
-const Settings = () => {
+const Settings = ({ onLogout }: { onLogout?: () => void }) => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,7 +94,7 @@ const Settings = () => {
   };
 
   return (
-    <Layout>
+    <Layout onLogout={onLogout}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">

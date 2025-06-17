@@ -52,7 +52,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-const Employees = () => {
+const Employees = ({ onLogout }: { onLogout?: () => void }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -74,7 +74,7 @@ const Employees = () => {
   });
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editEmployee, setEditEmployee] = useState<any | null>(null)
+  const [editEmployee, setEditEmployee] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -225,7 +225,7 @@ const Employees = () => {
   };
 
   return (
-    <Layout>
+    <Layout onLogout={onLogout}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">

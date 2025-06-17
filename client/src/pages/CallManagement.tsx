@@ -47,7 +47,7 @@ import {
   Users,
 } from "lucide-react";
 
-const CallManagement = () => {
+const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState("all");
   const [isNewCallDialogOpen, setIsNewCallDialogOpen] = useState(false);
@@ -174,7 +174,7 @@ const CallManagement = () => {
     });
 
   return (
-    <Layout>
+    <Layout onLogout={onLogout}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">

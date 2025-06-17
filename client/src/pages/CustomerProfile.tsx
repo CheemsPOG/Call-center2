@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import {
@@ -27,9 +26,9 @@ import {
   Plus,
 } from "lucide-react";
 
-const CustomerProfile = () => {
+const CustomerProfile = ({ onLogout }: { onLogout?: () => void }) => {
   const { id } = useParams();
-  
+
   const customer = {
     id: "CUST-001",
     name: "Alice Johnson",
@@ -127,14 +126,17 @@ const CustomerProfile = () => {
   ];
 
   return (
-    <Layout>
+    <Layout onLogout={onLogout}>
       <div className="space-y-6">
         {/* Customer Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
             <Avatar className="h-16 w-16">
               <AvatarFallback className="text-lg font-semibold">
-                {customer.name.split(' ').map(n => n[0]).join('')}
+                {customer.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -245,16 +247,23 @@ const CustomerProfile = () => {
               <CardContent>
                 <div className="space-y-4">
                   {callHistory.map((call) => (
-                    <div key={call.id} className="border rounded-lg p-4 dark:border-gray-700">
+                    <div
+                      key={call.id}
+                      className="border rounded-lg p-4 dark:border-gray-700"
+                    >
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <div className="flex items-center space-x-2">
                             <PhoneCall className="h-4 w-4 text-blue-500" />
-                            <span className="font-medium dark:text-white">{call.id}</span>
+                            <span className="font-medium dark:text-white">
+                              {call.id}
+                            </span>
                             <Badge variant="outline">{call.type}</Badge>
                             <Badge variant="outline">{call.category}</Badge>
                           </div>
-                          <h3 className="font-medium mt-1 dark:text-white">{call.subject}</h3>
+                          <h3 className="font-medium mt-1 dark:text-white">
+                            {call.subject}
+                          </h3>
                         </div>
                         <div className="text-right text-sm text-gray-500 dark:text-gray-400">
                           <div>{call.date}</div>
@@ -263,22 +272,37 @@ const CustomerProfile = () => {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Agent: </span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Agent:{" "}
+                          </span>
                           <span className="dark:text-white">{call.agent}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Status: </span>
-                          <Badge className="bg-green-100 text-green-800">{call.status}</Badge>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Status:{" "}
+                          </span>
+                          <Badge className="bg-green-100 text-green-800">
+                            {call.status}
+                          </Badge>
                         </div>
                         <div className="md:col-span-2">
-                          <span className="text-gray-600 dark:text-gray-400">Resolution: </span>
-                          <span className="dark:text-white">{call.resolution}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Resolution:{" "}
+                          </span>
+                          <span className="dark:text-white">
+                            {call.resolution}
+                          </span>
                         </div>
                         <div className="flex items-center">
-                          <span className="text-gray-600 dark:text-gray-400 mr-2">Rating: </span>
+                          <span className="text-gray-600 dark:text-gray-400 mr-2">
+                            Rating:{" "}
+                          </span>
                           <div className="flex items-center">
                             {[...Array(call.satisfaction)].map((_, i) => (
-                              <Star key={i} className="h-4 w-4 text-yellow-500 fill-current" />
+                              <Star
+                                key={i}
+                                className="h-4 w-4 text-yellow-500 fill-current"
+                              />
                             ))}
                           </div>
                         </div>
@@ -293,7 +317,9 @@ const CustomerProfile = () => {
           <TabsContent value="tickets">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
-                <CardTitle className="dark:text-white">Support Tickets</CardTitle>
+                <CardTitle className="dark:text-white">
+                  Support Tickets
+                </CardTitle>
                 <CardDescription className="dark:text-gray-400">
                   All support tickets created for this customer
                 </CardDescription>
@@ -301,30 +327,53 @@ const CustomerProfile = () => {
               <CardContent>
                 <div className="space-y-4">
                   {ticketHistory.map((ticket) => (
-                    <div key={ticket.id} className="border rounded-lg p-4 dark:border-gray-700">
+                    <div
+                      key={ticket.id}
+                      className="border rounded-lg p-4 dark:border-gray-700"
+                    >
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <div className="flex items-center space-x-2">
                             <Ticket className="h-4 w-4 text-orange-500" />
-                            <span className="font-medium dark:text-white">{ticket.id}</span>
-                            <Badge className="bg-green-100 text-green-800">{ticket.status}</Badge>
+                            <span className="font-medium dark:text-white">
+                              {ticket.id}
+                            </span>
+                            <Badge className="bg-green-100 text-green-800">
+                              {ticket.status}
+                            </Badge>
                           </div>
-                          <h3 className="font-medium mt-1 dark:text-white">{ticket.title}</h3>
+                          <h3 className="font-medium mt-1 dark:text-white">
+                            {ticket.title}
+                          </h3>
                         </div>
-                        <Badge className="bg-red-100 text-red-800">{ticket.priority}</Badge>
+                        <Badge className="bg-red-100 text-red-800">
+                          {ticket.priority}
+                        </Badge>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Created: </span>
-                          <span className="dark:text-white">{ticket.created}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Created:{" "}
+                          </span>
+                          <span className="dark:text-white">
+                            {ticket.created}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Resolved: </span>
-                          <span className="dark:text-white">{ticket.resolved}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Resolved:{" "}
+                          </span>
+                          <span className="dark:text-white">
+                            {ticket.resolved}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Agent: </span>
-                          <span className="dark:text-white">{ticket.agent}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Agent:{" "}
+                          </span>
+                          <span className="dark:text-white">
+                            {ticket.agent}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -338,7 +387,9 @@ const CustomerProfile = () => {
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle className="dark:text-white">Customer Notes</CardTitle>
+                  <CardTitle className="dark:text-white">
+                    Customer Notes
+                  </CardTitle>
                   <CardDescription className="dark:text-gray-400">
                     Internal notes and observations
                   </CardDescription>
@@ -351,14 +402,23 @@ const CustomerProfile = () => {
               <CardContent>
                 <div className="space-y-4">
                   {notes.map((note) => (
-                    <div key={note.id} className="border rounded-lg p-4 dark:border-gray-700">
+                    <div
+                      key={note.id}
+                      className="border rounded-lg p-4 dark:border-gray-700"
+                    >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           <FileText className="h-4 w-4 text-gray-500" />
-                          <span className="font-medium dark:text-white">{note.agent}</span>
-                          <Badge variant="outline" className="text-xs">{note.type}</Badge>
+                          <span className="font-medium dark:text-white">
+                            {note.agent}
+                          </span>
+                          <Badge variant="outline" className="text-xs">
+                            {note.type}
+                          </Badge>
                         </div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">{note.date}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {note.date}
+                        </span>
                       </div>
                       <p className="text-sm dark:text-gray-300">{note.note}</p>
                     </div>
@@ -371,7 +431,9 @@ const CustomerProfile = () => {
           <TabsContent value="profile">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
-                <CardTitle className="dark:text-white">Profile Details</CardTitle>
+                <CardTitle className="dark:text-white">
+                  Profile Details
+                </CardTitle>
                 <CardDescription className="dark:text-gray-400">
                   Customer information and preferences
                 </CardDescription>
@@ -415,7 +477,9 @@ const CustomerProfile = () => {
                       <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         Preferred Channel
                       </label>
-                      <p className="dark:text-white">{customer.preferredChannel}</p>
+                      <p className="dark:text-white">
+                        {customer.preferredChannel}
+                      </p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600 dark:text-gray-400">

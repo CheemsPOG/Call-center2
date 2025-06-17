@@ -1,4 +1,3 @@
-
 import Layout from "@/components/Layout";
 import {
   Card,
@@ -34,14 +33,50 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-const Analytics = () => {
+const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
   const todayMetrics = [
-    { title: "Total Calls", value: "342", change: "+12%", icon: Phone, color: "blue" },
-    { title: "Avg Handle Time", value: "4:23", change: "-8%", icon: Clock, color: "green" },
-    { title: "First Call Resolution", value: "87%", change: "+5%", icon: CheckCircle, color: "emerald" },
-    { title: "Customer Satisfaction", value: "4.7", change: "+0.2", icon: Star, color: "yellow" },
-    { title: "Service Level (30s)", value: "92%", change: "+3%", icon: Target, color: "purple" },
-    { title: "Active Agents", value: "24", change: "+2", icon: Users, color: "indigo" },
+    {
+      title: "Total Calls",
+      value: "342",
+      change: "+12%",
+      icon: Phone,
+      color: "blue",
+    },
+    {
+      title: "Avg Handle Time",
+      value: "4:23",
+      change: "-8%",
+      icon: Clock,
+      color: "green",
+    },
+    {
+      title: "First Call Resolution",
+      value: "87%",
+      change: "+5%",
+      icon: CheckCircle,
+      color: "emerald",
+    },
+    {
+      title: "Customer Satisfaction",
+      value: "4.7",
+      change: "+0.2",
+      icon: Star,
+      color: "yellow",
+    },
+    {
+      title: "Service Level (30s)",
+      value: "92%",
+      change: "+3%",
+      icon: Target,
+      color: "purple",
+    },
+    {
+      title: "Active Agents",
+      value: "24",
+      change: "+2",
+      icon: Users,
+      color: "indigo",
+    },
   ];
 
   const hourlyData = [
@@ -79,11 +114,13 @@ const Analytics = () => {
       purple: "text-purple-600 dark:text-purple-400",
       indigo: "text-indigo-600 dark:text-indigo-400",
     };
-    return colors[color as keyof typeof colors] || "text-gray-600 dark:text-gray-400";
+    return (
+      colors[color as keyof typeof colors] || "text-gray-600 dark:text-gray-400"
+    );
   };
 
   return (
-    <Layout>
+    <Layout onLogout={onLogout}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -99,10 +136,15 @@ const Analytics = () => {
           {todayMetrics.map((metric) => {
             const Icon = metric.icon;
             return (
-              <Card key={metric.title} className="dark:bg-gray-800 dark:border-gray-700">
+              <Card
+                key={metric.title}
+                className="dark:bg-gray-800 dark:border-gray-700"
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <Icon className={`h-5 w-5 ${getColorClasses(metric.color)}`} />
+                    <Icon
+                      className={`h-5 w-5 ${getColorClasses(metric.color)}`}
+                    />
                     <Badge variant="outline" className="text-xs">
                       {metric.change}
                     </Badge>
@@ -123,7 +165,9 @@ const Analytics = () => {
           {/* Hourly Call Volume */}
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
-              <CardTitle className="dark:text-white">Hourly Call Volume</CardTitle>
+              <CardTitle className="dark:text-white">
+                Hourly Call Volume
+              </CardTitle>
               <CardDescription className="dark:text-gray-400">
                 Calls received vs resolved today
               </CardDescription>
@@ -145,7 +189,9 @@ const Analytics = () => {
           {/* Call Types Distribution */}
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
-              <CardTitle className="dark:text-white">Call Distribution</CardTitle>
+              <CardTitle className="dark:text-white">
+                Call Distribution
+              </CardTitle>
               <CardDescription className="dark:text-gray-400">
                 Breakdown by call type
               </CardDescription>
@@ -175,7 +221,9 @@ const Analytics = () => {
         {/* Agent Performance */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="dark:text-white">Agent Performance Today</CardTitle>
+            <CardTitle className="dark:text-white">
+              Agent Performance Today
+            </CardTitle>
             <CardDescription className="dark:text-gray-400">
               Individual agent metrics and rankings
             </CardDescription>
@@ -183,7 +231,10 @@ const Analytics = () => {
           <CardContent>
             <div className="space-y-4">
               {agentPerformance.map((agent, index) => (
-                <div key={agent.name} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div
+                  key={agent.name}
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                >
                   <div className="flex items-center space-x-4">
                     <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                       <span className="text-white text-sm font-medium">
@@ -191,7 +242,9 @@ const Analytics = () => {
                       </span>
                     </div>
                     <div>
-                      <div className="font-medium dark:text-white">{agent.name}</div>
+                      <div className="font-medium dark:text-white">
+                        {agent.name}
+                      </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
                         {agent.calls} calls handled
                       </div>
@@ -199,19 +252,30 @@ const Analytics = () => {
                   </div>
                   <div className="flex items-center space-x-6 text-sm">
                     <div className="text-center">
-                      <div className="font-medium dark:text-white">{agent.avgTime}</div>
-                      <div className="text-gray-500 dark:text-gray-400">Avg Time</div>
+                      <div className="font-medium dark:text-white">
+                        {agent.avgTime}
+                      </div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        Avg Time
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="font-medium dark:text-white flex items-center">
                         <Star className="h-4 w-4 text-yellow-500 mr-1" />
                         {agent.satisfaction}
                       </div>
-                      <div className="text-gray-500 dark:text-gray-400">Rating</div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        Rating
+                      </div>
                     </div>
                     <div className="text-center">
-                      <Progress value={(agent.calls / 35) * 100} className="w-20" />
-                      <div className="text-gray-500 dark:text-gray-400">Goal Progress</div>
+                      <Progress
+                        value={(agent.calls / 35) * 100}
+                        className="w-20"
+                      />
+                      <div className="text-gray-500 dark:text-gray-400">
+                        Goal Progress
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -224,13 +288,17 @@ const Analytics = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
-              <CardTitle className="text-lg dark:text-white">Service Level</CardTitle>
+              <CardTitle className="text-lg dark:text-white">
+                Service Level
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="dark:text-gray-300">Answered within 30s</span>
+                    <span className="dark:text-gray-300">
+                      Answered within 30s
+                    </span>
                     <span className="dark:text-white">92%</span>
                   </div>
                   <Progress value={92} className="h-2" />
@@ -238,7 +306,9 @@ const Analytics = () => {
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="dark:text-gray-300">Target: 90%</span>
-                    <Badge className="bg-green-100 text-green-800">Above Target</Badge>
+                    <Badge className="bg-green-100 text-green-800">
+                      Above Target
+                    </Badge>
                   </div>
                 </div>
               </div>
@@ -247,20 +317,28 @@ const Analytics = () => {
 
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
-              <CardTitle className="text-lg dark:text-white">Queue Health</CardTitle>
+              <CardTitle className="text-lg dark:text-white">
+                Queue Health
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between">
-                  <span className="text-sm dark:text-gray-300">Calls in Queue</span>
+                  <span className="text-sm dark:text-gray-300">
+                    Calls in Queue
+                  </span>
                   <span className="font-medium dark:text-white">8</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm dark:text-gray-300">Longest Wait</span>
+                  <span className="text-sm dark:text-gray-300">
+                    Longest Wait
+                  </span>
                   <span className="font-medium dark:text-white">2:15</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm dark:text-gray-300">Avg Wait Time</span>
+                  <span className="text-sm dark:text-gray-300">
+                    Avg Wait Time
+                  </span>
                   <span className="font-medium dark:text-white">0:45</span>
                 </div>
               </div>
@@ -275,11 +353,15 @@ const Analytics = () => {
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
                   <AlertCircle className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm dark:text-gray-300">High queue volume</span>
+                  <span className="text-sm dark:text-gray-300">
+                    High queue volume
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm dark:text-gray-300">All systems operational</span>
+                  <span className="text-sm dark:text-gray-300">
+                    All systems operational
+                  </span>
                 </div>
               </div>
             </CardContent>

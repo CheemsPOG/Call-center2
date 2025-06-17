@@ -31,7 +31,7 @@ import {
   Zap,
 } from "lucide-react";
 
-const CallDetails = () => {
+const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -105,7 +105,7 @@ const CallDetails = () => {
   ];
 
   return (
-    <Layout>
+    <Layout onLogout={onLogout}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center space-x-4">
