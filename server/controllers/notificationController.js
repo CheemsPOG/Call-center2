@@ -49,7 +49,32 @@ const getNotifications = async (req, res) => {
   res.json(data);
 };
 
+// Delete a notification by id
+const deleteNotification = async (req, res) => {
+  const { id } = req.params;
+  const { error } = await supabase.from("notifications").delete().eq("id", id);
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  res.json({ message: "Notification deleted" });
+};
+
+// Mark a notification as read by id
+const markAsRead = async (req, res) => {
+  const { id } = req.params;
+  const { error } = await supabase
+    .from("notifications")
+    .update({ read: true })
+    .eq("id", id);
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  res.json({ message: "Notification marked as read" });
+};
+
 module.exports = {
   addHardcodedNotifications,
   getNotifications,
+  deleteNotification,
+  markAsRead,
 };

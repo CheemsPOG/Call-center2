@@ -58,41 +58,26 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
     const savedTheme = localStorage.getItem("theme");
     return savedTheme === "dark";
   });
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      title: "New Call Assigned",
-      message: "You have been assigned to handle a high-priority support call",
-      time: "2 minutes ago",
-      type: "call",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Customer Feedback",
-      message: "You received a 5-star rating from your last call",
-      time: "15 minutes ago",
-      type: "rating",
-      read: false,
-    },
-    {
-      id: 3,
-      title: "System Alert",
-      message: "Call center system maintenance scheduled for tonight",
-      time: "1 hour ago",
-      type: "alert",
-      read: false,
-    },
-    {
-      id: 4,
-      title: "New Message",
-      message: "Team meeting scheduled for tomorrow at 10 AM",
-      time: "2 hours ago",
-      type: "message",
-      read: false,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    // Fetch notifications from backend API
+    fetch("http://localhost:4000/notifications")
+      .then((res) => res.json())
+      .then((data) => {
+        // Convert time to a readable string for UI
+        const formatted = data.map((n: any) => ({
+          ...n,
+          time: new Date(n.time).toLocaleString(),
+        }));
+        setNotifications(formatted);
+      })
+      .catch((err) => {
+        // Optionally handle error
+        setNotifications([]);
+      });
+  }, []);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -182,9 +167,13 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
     }
   };
 
-  const markAsRead = (id: number) => {
-    setNotifications(
-      notifications.map((notification) =>
+  const markAsRead = async (id: number) => {
+    // Call backend to mark notification as read
+    await fetch(`http://localhost:4000/notifications/${id}/read`, {
+      method: "PATCH",
+    });
+    setNotifications((prev) =>
+      prev.map((notification) =>
         notification.id === id ? { ...notification, read: true } : notification
       )
     );
@@ -199,9 +188,13 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
     );
   };
 
-  const deleteNotification = (id: number) => {
-    setNotifications(
-      notifications.filter((notification) => notification.id !== id)
+  const deleteNotification = async (id: number) => {
+    // Call backend to delete notification
+    await fetch(`http://localhost:4000/notifications/${id}`, {
+      method: "DELETE",
+    });
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.id !== id)
     );
   };
 
