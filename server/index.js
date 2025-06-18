@@ -9,8 +9,10 @@ app.use(cors());
 app.use(express.json());
 
 const employeeRoutes = require("./routes/employeeRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 app.use("/employees", employeeRoutes);
+app.use("/notifications", notificationRoutes);
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
