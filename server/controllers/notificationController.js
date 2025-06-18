@@ -30,11 +30,23 @@ const addHardcodedNotifications = async (req, res) => {
   ];
 
   // Insert notifications
-  const { error } = await supabase.from("notifications").insert(notifications);
-  if (error) {
-    return res.status(500).json({ error: error.message });
+  try {
+    const { data, error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("id", id)
+      .select(); // returns deleted rows
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    if (data.length === 0) {
+      return res.status(404).json({ error: "Notification not found" });
+    }
+    return res.json({ message: "Notification deleted" });
+  } catch (err) {
+    return res.status(500).json({ error: "Unexpected server error" });
   }
-  res.status(201).json({ message: "Notifications added successfully" });
 };
 
 // Fetch all notifications
@@ -52,11 +64,23 @@ const getNotifications = async (req, res) => {
 // Delete a notification by id
 const deleteNotification = async (req, res) => {
   const { id } = req.params;
-  const { error } = await supabase.from("notifications").delete().eq("id", id);
-  if (error) {
-    return res.status(500).json({ error: error.message });
+  try {
+    const { data, error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("id", id)
+      .select(); // returns deleted rows
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    if (data.length === 0) {
+      return res.status(404).json({ error: "Notification not found" });
+    }
+    return res.json({ message: "Notification deleted" });
+  } catch (err) {
+    return res.status(500).json({ error: "Unexpected server error" });
   }
-  res.json({ message: "Notification deleted" });
 };
 
 // Mark a notification as read by id
