@@ -64,6 +64,7 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showQuickActions, setShowQuickActions] = useState(false);
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
 
   useEffect(() => {
     // Fetch notifications from backend API
@@ -418,7 +419,10 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
                 </ScrollArea>
               </DropdownMenuContent>
             </DropdownMenu>
-            <DropdownMenu>
+            <DropdownMenu
+              open={isAvatarMenuOpen}
+              onOpenChange={setIsAvatarMenuOpen}
+            >
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -437,7 +441,11 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
                       style={{ transform: "translate(30%, 30%)" }}
                     />
                   </div>
-                  <ChevronDown className="ml-1 w-4 h-4 text-gray-500 dark:text-gray-300 group-hover:text-blue-600 group-focus:text-blue-600 transition" />
+                  <ChevronDown
+                    className={`ml-1 w-4 h-4 text-gray-500 dark:text-gray-300 group-hover:text-blue-600 group-focus:text-blue-600 transition-transform duration-200 ${
+                      isAvatarMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
