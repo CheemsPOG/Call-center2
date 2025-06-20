@@ -357,6 +357,23 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
                 </div>
               ))}
             </div>
+            {/* Fun stat: show how many 5-star feedbacks the agent received today */}
+            <div className="flex items-center justify-between mt-6">
+              <div className="flex items-center space-x-2">
+                <Star className="h-5 w-5 text-yellow-400" />
+                <span className="text-sm text-gray-700 dark:text-gray-200 font-medium">
+                  2 five-star feedbacks today
+                </span>
+              </div>
+              {/* See more feedback link */}
+              <a
+                href="#"
+                className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                // In a real app, this would route to a full feedback page
+              >
+                See more feedback
+              </a>
+            </div>
           </CardContent>
         </Card>
 
