@@ -46,6 +46,15 @@ import {
   Volume2,
   Users,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
   const navigate = useNavigate();
@@ -54,6 +63,9 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [callCategory, setCallCategory] = useState("support");
   const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
 
   const handleNewCall = () => {
     // Here you would typically make an API call to initiate the call
@@ -171,7 +183,26 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
         call.customerPhone.toLowerCase().includes(searchLower) ||
         call.subject.toLowerCase().includes(searchLower)
       );
-    });
+    })
+    .filter((call) =>
+      typeFilter.length === 0 ? true : typeFilter.includes(call.type)
+    )
+    .filter((call) =>
+      categoryFilter.length === 0
+        ? true
+        : categoryFilter.includes(call.category)
+    )
+    .filter((call) =>
+      priorityFilter.length === 0
+        ? true
+        : priorityFilter.includes(call.priority)
+    );
+
+  const clearAllFilters = () => {
+    setTypeFilter([]);
+    setCategoryFilter([]);
+    setPriorityFilter([]);
+  };
 
   return (
     <Layout onLogout={onLogout}>
@@ -393,13 +424,157 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
                   </SelectItem>
                 </SelectContent>
               </Select>
-              <Button
-                variant="outline"
-                className="dark:border-gray-700 dark:hover:bg-gray-700"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                More Filters
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="dark:border-gray-700 dark:hover:bg-gray-700"
+                  >
+                    <Filter className="h-4 w-4 mr-2" />
+                    More Filters
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 dark:bg-gray-800 dark:border-gray-700"
+                >
+                  <DropdownMenuLabel>Call Type</DropdownMenuLabel>
+                  <DropdownMenuCheckboxItem
+                    checked={typeFilter.includes("Inbound")}
+                    onCheckedChange={() =>
+                      setTypeFilter((prev) =>
+                        prev.includes("Inbound")
+                          ? prev.filter((t) => t !== "Inbound")
+                          : [...prev, "Inbound"]
+                      )
+                    }
+                  >
+                    Inbound
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={typeFilter.includes("Outbound")}
+                    onCheckedChange={() =>
+                      setTypeFilter((prev) =>
+                        prev.includes("Outbound")
+                          ? prev.filter((t) => t !== "Outbound")
+                          : [...prev, "Outbound"]
+                      )
+                    }
+                  >
+                    Outbound
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Category</DropdownMenuLabel>
+                  <DropdownMenuCheckboxItem
+                    checked={categoryFilter.includes("Support")}
+                    onCheckedChange={() =>
+                      setCategoryFilter((prev) =>
+                        prev.includes("Support")
+                          ? prev.filter((c) => c !== "Support")
+                          : [...prev, "Support"]
+                      )
+                    }
+                  >
+                    Support
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={categoryFilter.includes("Sales")}
+                    onCheckedChange={() =>
+                      setCategoryFilter((prev) =>
+                        prev.includes("Sales")
+                          ? prev.filter((c) => c !== "Sales")
+                          : [...prev, "Sales"]
+                      )
+                    }
+                  >
+                    Sales
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={categoryFilter.includes("Technical")}
+                    onCheckedChange={() =>
+                      setCategoryFilter((prev) =>
+                        prev.includes("Technical")
+                          ? prev.filter((c) => c !== "Technical")
+                          : [...prev, "Technical"]
+                      )
+                    }
+                  >
+                    Technical
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Priority</DropdownMenuLabel>
+                  <DropdownMenuCheckboxItem
+                    checked={priorityFilter.includes("high")}
+                    onCheckedChange={() =>
+                      setPriorityFilter((prev) =>
+                        prev.includes("high")
+                          ? prev.filter((p) => p !== "high")
+                          : [...prev, "high"]
+                      )
+                    }
+                  >
+                    High
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={priorityFilter.includes("medium")}
+                    onCheckedChange={() =>
+                      setPriorityFilter((prev) =>
+                        prev.includes("medium")
+                          ? prev.filter((p) => p !== "medium")
+                          : [...prev, "medium"]
+                      )
+                    }
+                  >
+                    Medium
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={priorityFilter.includes("low")}
+                    onCheckedChange={() =>
+                      setPriorityFilter((prev) =>
+                        prev.includes("low")
+                          ? prev.filter((p) => p !== "low")
+                          : [...prev, "low"]
+                      )
+                    }
+                  >
+                    Low
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={clearAllFilters}
+                    className="text-red-600 dark:text-red-400"
+                  >
+                    Clear Filters
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            {/* Show active filters as badges */}
+            <div className="flex flex-wrap gap-2 mt-4">
+              {typeFilter.map((t) => (
+                <Badge
+                  key={t}
+                  className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                >
+                  {t}
+                </Badge>
+              ))}
+              {categoryFilter.map((c) => (
+                <Badge
+                  key={c}
+                  className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                >
+                  {c}
+                </Badge>
+              ))}
+              {priorityFilter.map((p) => (
+                <Badge
+                  key={p}
+                  className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                >
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
+                </Badge>
+              ))}
             </div>
           </CardContent>
         </Card>

@@ -23,6 +23,7 @@ import {
   Settings as SettingsIcon,
   LayoutDashboard,
   X,
+  Calendar,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -120,6 +121,16 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
       path: "/analytics",
     },
     {
+      title: "Team",
+      icon: Users,
+      path: "/team",
+    },
+    {
+      title: "Schedule",
+      icon: Calendar,
+      path: "/schedule",
+    },
+    {
       title: "Settings",
       icon: SettingsIcon,
       path: "/settings",
@@ -211,12 +222,12 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
         )}
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white dark:bg-gray-800 w-64">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 bg-blue-600 dark:bg-blue-900 rounded-lg p-2">
             <div className="flex items-center">
-              <div className="bg-blue-600 p-2 rounded-lg">
+              <div className="bg-blue-600 dark:bg-blue-900 p-2 rounded-lg">
                 <Phone className="h-6 w-6 text-white" />
               </div>
-              <span className="ml-3 text-xl font-semibold text-gray-900 dark:text-white">
+              <span className="ml-3 text-xl font-semibold text-white">
                 Call Center Hub
               </span>
             </div>
@@ -224,12 +235,12 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
               variant="ghost"
               size="icon"
               onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden"
+              className="lg:hidden text-white"
             >
               <X className="h-6 w-6" />
             </Button>
           </div>
-          <nav className="space-y-2">
+          <nav className="space-y-2 mt-8">
             {menuItems.map((item) => (
               <Link
                 key={item.path}

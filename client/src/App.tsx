@@ -15,6 +15,8 @@ import {
   NotFound,
   Analytics,
   CustomerProfile,
+  Schedule,
+  Team,
 } from "./pages";
 
 const queryClient = new QueryClient();
@@ -130,6 +132,26 @@ const App = () => {
               element={
                 isAuthenticated ? (
                   <CustomerProfile onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/schedule"
+              element={
+                isAuthenticated ? (
+                  <Schedule onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/team"
+              element={
+                isAuthenticated ? (
+                  <Team onLogout={handleLogout} />
                 ) : (
                   <Navigate to="/login" />
                 )

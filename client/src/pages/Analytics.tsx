@@ -119,6 +119,40 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
     );
   };
 
+  // Placeholder for current agent's performance
+  const myPerformance = {
+    name: "John Doe",
+    calls: 28,
+    avgTime: "3:45",
+    satisfaction: 4.8,
+    goal: 35,
+  };
+
+  // Placeholder for recent feedback
+  const recentFeedback = [
+    {
+      id: 1,
+      customer: "Alice Johnson",
+      time: "09:15 AM",
+      rating: 5,
+      comment: "Great support, very helpful!",
+    },
+    {
+      id: 2,
+      customer: "Bob Smith",
+      time: "10:30 AM",
+      rating: 4,
+      comment: "Quick response, thanks!",
+    },
+    {
+      id: 3,
+      customer: "Carol Davis",
+      time: "11:45 AM",
+      rating: 5,
+      comment: "Resolved my issue efficiently.",
+    },
+  ];
+
   return (
     <Layout onLogout={onLogout}>
       <div className="space-y-6">
@@ -218,64 +252,106 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
           </Card>
         </div>
 
-        {/* Agent Performance */}
+        {/* My Performance Today */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="dark:text-white">
-              Agent Performance Today
+              My Performance Today
             </CardTitle>
             <CardDescription className="dark:text-gray-400">
-              Individual agent metrics and rankings
+              Your personal stats and progress for today
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg font-medium">
+                    {myPerformance.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-medium dark:text-white text-lg">
+                    {myPerformance.name}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {myPerformance.calls} calls handled
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-8 text-sm">
+                <div className="text-center">
+                  <div className="font-medium dark:text-white">
+                    {myPerformance.avgTime}
+                  </div>
+                  <div className="text-gray-500 dark:text-gray-400">
+                    Avg Time
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="font-medium dark:text-white flex items-center justify-center">
+                    <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                    {myPerformance.satisfaction}
+                  </div>
+                  <div className="text-gray-500 dark:text-gray-400">Rating</div>
+                </div>
+                <div className="text-center">
+                  <Progress
+                    value={(myPerformance.calls / myPerformance.goal) * 100}
+                    className="w-20"
+                  />
+                  <div className="text-gray-500 dark:text-gray-400">
+                    Goal Progress
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Feedback */}
+        <Card className="dark:bg-gray-800 dark:border-gray-700 mt-6">
+          <CardHeader>
+            <CardTitle className="dark:text-white">Recent Feedback</CardTitle>
+            <CardDescription className="dark:text-gray-400">
+              Latest customer feedback for you
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {agentPerformance.map((agent, index) => (
+              {recentFeedback.map((fb) => (
                 <div
-                  key={agent.name}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                  key={fb.id}
+                  className="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">
-                        {index + 1}
-                      </span>
-                    </div>
-                    <div>
-                      <div className="font-medium dark:text-white">
-                        {agent.name}
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {agent.calls} calls handled
-                      </div>
-                    </div>
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                    {fb.customer
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </div>
-                  <div className="flex items-center space-x-6 text-sm">
-                    <div className="text-center">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
                       <div className="font-medium dark:text-white">
-                        {agent.avgTime}
+                        {fb.customer}
                       </div>
-                      <div className="text-gray-500 dark:text-gray-400">
-                        Avg Time
-                      </div>
+                      <div className="text-xs text-gray-400">{fb.time}</div>
                     </div>
-                    <div className="text-center">
-                      <div className="font-medium dark:text-white flex items-center">
-                        <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                        {agent.satisfaction}
-                      </div>
-                      <div className="text-gray-500 dark:text-gray-400">
-                        Rating
-                      </div>
+                    <div className="flex items-center mt-1 mb-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-4 w-4 ${
+                            i < fb.rating ? "text-yellow-400" : "text-gray-300"
+                          }`}
+                        />
+                      ))}
                     </div>
-                    <div className="text-center">
-                      <Progress
-                        value={(agent.calls / 35) * 100}
-                        className="w-20"
-                      />
-                      <div className="text-gray-500 dark:text-gray-400">
-                        Goal Progress
-                      </div>
+                    <div className="text-gray-700 dark:text-gray-200 text-sm">
+                      {fb.comment}
                     </div>
                   </div>
                 </div>
