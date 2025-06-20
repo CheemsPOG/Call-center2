@@ -99,21 +99,21 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
       icon: LayoutDashboard,
       path: "/dashboard",
     },
-    {
-      title: "Employees",
-      icon: Users,
-      path: "/employees",
-    },
+    // {
+    //   title: "Employees",
+    //   icon: Users,
+    //   path: "/employees",
+    // },
     {
       title: "Call Management",
       icon: Phone,
       path: "/calls",
     },
-    {
-      title: "Ticket Management",
-      icon: Ticket,
-      path: "/tickets",
-    },
+    // {
+    //   title: "Ticket Management",
+    //   icon: Ticket,
+    //   path: "/tickets",
+    // },
     {
       title: "Analytics",
       icon: BarChart3,
@@ -125,6 +125,7 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
       path: "/settings",
     },
   ];
+  // Employees and Ticket Management are hidden from the sidebar as requested.
 
   const getStatusColor = (status: string) => {
     switch (status) {
