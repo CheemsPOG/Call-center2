@@ -80,10 +80,12 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
-            <Button className="bg-red-600 hover:bg-red-700">
-              <PhoneOff className="h-4 w-4 mr-2" />
-              End Call
-            </Button>
+            {callData.status === "active" && (
+              <Button className="bg-red-600 hover:bg-red-700">
+                <PhoneOff className="h-4 w-4 mr-2" />
+                End Call
+              </Button>
+            )}
           </div>
         </div>
 
