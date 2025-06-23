@@ -48,7 +48,7 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
     status: "active",
     duration: "00:15:32",
     startTime: "2024-01-15 09:15:00",
-    priority: "high",
+    priority: "High",
     subject: "Account access issues",
     summary:
       "Customer unable to access account due to forgotten password. Assisted with password reset process.",
