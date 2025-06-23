@@ -1,4 +1,5 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Layout from "@/components/Layout";
 import {
   Card,
@@ -30,35 +31,22 @@ import {
   FileText,
   Zap,
 } from "lucide-react";
+import { calls } from "@/lib/mockData";
 
 const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Mock call data - in real app this would come from API
-  const callData = {
-    id: id || "CALL-001",
-    customer: "Alice Johnson",
-    customerPhone: "+1 (555) 901-2345",
-    customerEmail: "alice.johnson@email.com",
-    customerLocation: "New York, NY",
-    agent: "John Doe",
-    type: "Inbound",
-    category: "Support",
-    status: "active",
-    duration: "00:15:32",
-    startTime: "2024-01-15 09:15:00",
-    priority: "High",
-    subject: "Account access issues",
-    summary:
-      "Customer unable to access account due to forgotten password. Assisted with password reset process.",
-    notes:
-      "Customer was very patient. Previous attempts to reset failed due to email issues. Verified identity through security questions.",
-    recording: "available",
-    satisfaction: 4.5,
-    resolution: "pending",
-  };
+  const callData = location.state?.call || calls.find((c) => c.id === id);
 
+  useEffect(() => {
+    if (!callData) {
+      navigate("/calls", { replace: true });
+    }
+  }, [callData, navigate]);
+
+  // These are still hardcoded as they are not part of the main call object
   const aiSummary = {
     sentiment: "Neutral",
     keyTopics: ["Password Reset", "Account Access", "Email Issues"],
@@ -103,6 +91,10 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
       description: "Waiting for email confirmation",
     },
   ];
+
+  if (!callData) {
+    return null; // Render nothing while redirecting
+  }
 
   return (
     <Layout onLogout={onLogout}>
@@ -174,7 +166,8 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                      {callData.priority}
+                      {callData.priority.charAt(0).toUpperCase() +
+                        callData.priority.slice(1)}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Priority
@@ -318,28 +311,6 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Notes */}
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="dark:text-white">Call Notes</CardTitle>
-                <CardDescription className="dark:text-gray-400">
-                  Add or edit notes about this call
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  placeholder="Add your notes here..."
-                  value={callData.notes}
-                  className="min-h-32 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-                />
-                <div className="flex justify-end mt-4">
-                  <Button className="dark:bg-blue-600 dark:hover:bg-blue-700">
-                    Save Notes
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Sidebar */}
@@ -359,7 +330,9 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
                   <div>
                     <div
                       className="font-semibold cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
-                      onClick={() => navigate(`/customers/CUST-001`)}
+                      onClick={() =>
+                        navigate(`/customers/${callData.customerId}`)
+                      }
                     >
                       {callData.customer}
                     </div>
@@ -409,7 +382,12 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
               <CardContent>
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium">JD</span>
+                    <span className="text-white font-medium">
+                      {callData.agent
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </span>
                   </div>
                   <div>
                     <div className="font-semibold">{callData.agent}</div>
@@ -466,6 +444,27 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
                   <User className="h-4 w-4 mr-2" />
                   Schedule Follow-up
                 </Button>
+              </CardContent>
+            </Card>
+            {/* Notes */}
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="dark:text-white">Call Notes</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Add or edit notes about this call
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  placeholder="Add your notes here..."
+                  defaultValue={callData.notes}
+                  className="min-h-32 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                />
+                <div className="flex justify-end mt-4">
+                  <Button className="dark:bg-blue-600 dark:hover:bg-blue-700">
+                    Save Notes
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>

@@ -55,6 +55,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { calls } from "@/lib/mockData";
 
 const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
   const navigate = useNavigate();
@@ -74,77 +75,6 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
     setPhoneNumber("");
     setCallCategory("support");
   };
-
-  const calls = [
-    {
-      id: "CALL-001",
-      customerId: "CUST-001",
-      customer: "Alice Johnson",
-      customerPhone: "+1 (555) 901-2345",
-      agent: "John Doe",
-      type: "Inbound",
-      category: "Support",
-      status: "active",
-      duration: "00:15:32",
-      startTime: "2024-01-15 09:15:00",
-      priority: "high",
-      subject: "Account access issues",
-    },
-    {
-      id: "CALL-002",
-      customerId: "CUST-002",
-      customer: "Bob Smith",
-      customerPhone: "+1 (555) 234-5678",
-      agent: "Jane Smith",
-      type: "Outbound",
-      category: "Sales",
-      status: "completed",
-      duration: "00:08:15",
-      startTime: "2024-01-15 10:30:00",
-      priority: "medium",
-      subject: "Product inquiry",
-    },
-    {
-      id: "CALL-003",
-      customerId: "CUST-003",
-      customer: "Carol Davis",
-      customerPhone: "+1 (555) 345-6789",
-      agent: "Mike Wilson",
-      type: "Inbound",
-      category: "Technical",
-      status: "queued",
-      duration: "00:02:10",
-      startTime: "2024-01-15 11:45:00",
-      priority: "low",
-      subject: "Software installation help",
-    },
-    {
-      id: "CALL-004",
-      customer: "David Brown",
-      customerPhone: "+1 (555) 904-5678",
-      agent: "Sarah Lee",
-      type: "Inbound",
-      category: "Technical",
-      status: "active",
-      duration: "00:25:43",
-      startTime: "2024-01-15 09:05:00",
-      priority: "high",
-      subject: "Technical support request",
-    },
-    {
-      id: "CALL-005",
-      customer: "Emma Wilson",
-      customerPhone: "+1 (555) 905-6789",
-      agent: "Mike Wilson",
-      type: "Inbound",
-      category: "Support",
-      status: "on-hold",
-      duration: "00:12:20",
-      startTime: "2024-01-15 09:20:00",
-      priority: "low",
-      subject: "General inquiry",
-    },
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -577,7 +507,6 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
                 <TableRow className="dark:border-gray-700">
                   <TableHead className="dark:text-gray-300">Call ID</TableHead>
                   <TableHead className="dark:text-gray-300">Customer</TableHead>
-                  <TableHead className="dark:text-gray-300">Agent</TableHead>
                   <TableHead className="dark:text-gray-300">
                     Type & Category
                   </TableHead>
@@ -612,29 +541,6 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
                         <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-32">
                           {call.subject}
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        {call.agent !== "Waiting..." ? (
-                          <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                              <span className="text-white text-sm">
-                                {call.agent
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </span>
-                            </div>
-                            <span className="dark:text-white">
-                              {call.agent}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-500 dark:text-gray-400">
-                            {call.agent}
-                          </span>
-                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -674,7 +580,9 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
                           variant="ghost"
                           size="icon"
                           className="dark:hover:bg-gray-700"
-                          onClick={() => navigate(`/calls/${call.id}`)}
+                          onClick={() =>
+                            navigate(`/calls/${call.id}`, { state: { call } })
+                          }
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
