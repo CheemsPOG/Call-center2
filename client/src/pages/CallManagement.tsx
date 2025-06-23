@@ -204,6 +204,16 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
     setPriorityFilter([]);
   };
 
+  const handleFilterChange = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    value: string,
+    checked: boolean
+  ) => {
+    setter((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
+  };
+
   return (
     <Layout onLogout={onLogout}>
       <div className="space-y-6">
@@ -441,24 +451,16 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
                   <DropdownMenuLabel>Call Type</DropdownMenuLabel>
                   <DropdownMenuCheckboxItem
                     checked={typeFilter.includes("Inbound")}
-                    onCheckedChange={() =>
-                      setTypeFilter((prev) =>
-                        prev.includes("Inbound")
-                          ? prev.filter((t) => t !== "Inbound")
-                          : [...prev, "Inbound"]
-                      )
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(setTypeFilter, "Inbound", checked)
                     }
                   >
                     Inbound
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
                     checked={typeFilter.includes("Outbound")}
-                    onCheckedChange={() =>
-                      setTypeFilter((prev) =>
-                        prev.includes("Outbound")
-                          ? prev.filter((t) => t !== "Outbound")
-                          : [...prev, "Outbound"]
-                      )
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(setTypeFilter, "Outbound", checked)
                     }
                   >
                     Outbound
@@ -467,35 +469,27 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
                   <DropdownMenuLabel>Category</DropdownMenuLabel>
                   <DropdownMenuCheckboxItem
                     checked={categoryFilter.includes("Support")}
-                    onCheckedChange={() =>
-                      setCategoryFilter((prev) =>
-                        prev.includes("Support")
-                          ? prev.filter((c) => c !== "Support")
-                          : [...prev, "Support"]
-                      )
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(setCategoryFilter, "Support", checked)
                     }
                   >
                     Support
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
                     checked={categoryFilter.includes("Sales")}
-                    onCheckedChange={() =>
-                      setCategoryFilter((prev) =>
-                        prev.includes("Sales")
-                          ? prev.filter((c) => c !== "Sales")
-                          : [...prev, "Sales"]
-                      )
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(setCategoryFilter, "Sales", checked)
                     }
                   >
                     Sales
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
                     checked={categoryFilter.includes("Technical")}
-                    onCheckedChange={() =>
-                      setCategoryFilter((prev) =>
-                        prev.includes("Technical")
-                          ? prev.filter((c) => c !== "Technical")
-                          : [...prev, "Technical"]
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(
+                        setCategoryFilter,
+                        "Technical",
+                        checked
                       )
                     }
                   >
@@ -505,36 +499,24 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
                   <DropdownMenuLabel>Priority</DropdownMenuLabel>
                   <DropdownMenuCheckboxItem
                     checked={priorityFilter.includes("high")}
-                    onCheckedChange={() =>
-                      setPriorityFilter((prev) =>
-                        prev.includes("high")
-                          ? prev.filter((p) => p !== "high")
-                          : [...prev, "high"]
-                      )
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(setPriorityFilter, "high", checked)
                     }
                   >
                     High
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
                     checked={priorityFilter.includes("medium")}
-                    onCheckedChange={() =>
-                      setPriorityFilter((prev) =>
-                        prev.includes("medium")
-                          ? prev.filter((p) => p !== "medium")
-                          : [...prev, "medium"]
-                      )
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(setPriorityFilter, "medium", checked)
                     }
                   >
                     Medium
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
                     checked={priorityFilter.includes("low")}
-                    onCheckedChange={() =>
-                      setPriorityFilter((prev) =>
-                        prev.includes("low")
-                          ? prev.filter((p) => p !== "low")
-                          : [...prev, "low"]
-                      )
+                    onCheckedChange={(checked) =>
+                      handleFilterChange(setPriorityFilter, "low", checked)
                     }
                   >
                     Low
