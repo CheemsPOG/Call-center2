@@ -26,16 +26,19 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      setLoading(false);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -44,6 +47,14 @@ const App = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent"></div>
+      </div>
+    );
+  }
 
   const isAuthenticated = !!session;
 
