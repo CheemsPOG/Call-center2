@@ -19,6 +19,7 @@ import {
   CustomerProfile,
   Schedule,
   Team,
+  KnowledgeBase,
 } from "./pages";
 
 const queryClient = new QueryClient();
@@ -154,6 +155,16 @@ const App = () => {
               element={
                 isAuthenticated ? (
                   <Team onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/knowledge-base"
+              element={
+                isAuthenticated ? (
+                  <KnowledgeBase onLogout={handleLogout} />
                 ) : (
                   <Navigate to="/login" />
                 )

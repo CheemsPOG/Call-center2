@@ -9,4 +9,5 @@ export { default as NotFound } from './NotFound';
 export { default as Analytics } from './Analytics';
 export { default as CustomerProfile } from './CustomerProfile';
 export { default as Team } from "./Team";
-export { default as Schedule } from "./Schedule"; 
+export { default as Schedule } from "./Schedule";
+export { default as KnowledgeBase } from "./KnowledgeBase"; 

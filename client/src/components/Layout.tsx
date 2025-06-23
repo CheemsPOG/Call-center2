@@ -26,6 +26,7 @@ import {
   Calendar,
   Zap,
   ChevronDown,
+  BookText,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -133,6 +134,11 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
       title: "Schedule",
       icon: Calendar,
       path: "/schedule",
+    },
+    {
+      title: "Knowledge Base",
+      icon: BookText,
+      path: "/knowledge-base",
     },
     {
       title: "Settings",
