@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft,
   Phone,
@@ -20,14 +19,11 @@ import {
   Volume2,
   VolumeX,
   Pause,
-  Play,
   Download,
   MessageSquare,
-  Clock,
   User,
   MapPin,
   Mail,
-  Star,
   FileText,
   Zap,
 } from "lucide-react";
@@ -46,7 +42,11 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
     }
   }, [callData, navigate]);
 
-  // These are still hardcoded as they are not part of the main call object
+  if (!callData) {
+    return null; // Render nothing while redirecting
+  }
+
+  // This can be made dynamic later
   const aiSummary = {
     sentiment: "Neutral",
     keyTopics: ["Password Reset", "Account Access", "Email Issues"],
@@ -59,47 +59,9 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
     confidence: 87,
   };
 
-  const callTimeline = [
-    {
-      time: "09:15:00",
-      event: "Call initiated",
-      description: "Customer called support line",
-    },
-    {
-      time: "09:16:30",
-      event: "Agent assigned",
-      description: "John Doe accepted the call",
-    },
-    {
-      time: "09:18:15",
-      event: "Issue identified",
-      description: "Password reset assistance required",
-    },
-    {
-      time: "09:25:45",
-      event: "Identity verified",
-      description: "Security questions answered successfully",
-    },
-    {
-      time: "09:28:30",
-      event: "Solution provided",
-      description: "Password reset email sent",
-    },
-    {
-      time: "09:30:32",
-      event: "Call ongoing",
-      description: "Waiting for email confirmation",
-    },
-  ];
-
-  if (!callData) {
-    return null; // Render nothing while redirecting
-  }
-
   return (
     <Layout onLogout={onLogout}>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex items-center space-x-4">
           <Button variant="ghost" onClick={() => navigate("/calls")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -125,10 +87,8 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Call Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Call Status */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -174,10 +134,7 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
                     </div>
                   </div>
                 </div>
-
                 <Separator className="my-4 dark:bg-gray-700" />
-
-                {/* Call Controls */}
                 <div className="flex items-center justify-center space-x-4">
                   <Button
                     variant="outline"
@@ -211,7 +168,6 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
               </CardContent>
             </Card>
 
-            {/* AI Summary */}
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="flex items-center dark:text-white">
@@ -280,7 +236,6 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
               </CardContent>
             </Card>
 
-            {/* Call Timeline */}
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="dark:text-white">Call Timeline</CardTitle>
@@ -290,7 +245,7 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {callTimeline.map((event, index) => (
+                  {callData.timeline.map((event, index) => (
                     <div key={index} className="flex items-start space-x-3">
                       <div className="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full mt-2"></div>
                       <div className="flex-1">
@@ -313,9 +268,7 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
             </Card>
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Customer Info */}
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="dark:text-white">
@@ -341,9 +294,7 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
                     </div>
                   </div>
                 </div>
-
                 <Separator />
-
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <Phone className="h-4 w-4 text-gray-400" />
@@ -358,66 +309,25 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
                     <span className="text-sm">{callData.customerLocation}</span>
                   </div>
                 </div>
-
                 <Separator />
-
                 <div>
                   <h4 className="font-semibold mb-2">Previous Interactions</h4>
                   <div className="text-sm text-gray-600">
-                    <div>Last call: 2 weeks ago</div>
-                    <div>Total calls: 8</div>
-                    <div>Avg satisfaction: 4.2/5</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Agent Info */}
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="dark:text-white">
-                  Assigned Agent
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium">
-                      {callData.agent
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="font-semibold">{callData.agent}</div>
-                    <div className="text-sm text-gray-500">Senior Agent</div>
-                  </div>
-                </div>
-
-                <Separator className="my-4" />
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Performance Rating</span>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                      <span className="text-sm font-medium">4.9</span>
+                    <div>
+                      Last call: {callData.previousInteractions.lastCall}
+                    </div>
+                    <div>
+                      Total calls: {callData.previousInteractions.totalCalls}
+                    </div>
+                    <div>
+                      Avg satisfaction:{" "}
+                      {callData.previousInteractions.avgSatisfaction}/5
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Calls Today</span>
-                    <span className="text-sm font-medium">15</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Avg Handle Time</span>
-                    <span className="text-sm font-medium">8:32</span>
-                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Quick Actions */}
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="dark:text-white">Quick Actions</CardTitle>
@@ -446,7 +356,7 @@ const CallDetails = ({ onLogout }: { onLogout?: () => void }) => {
                 </Button>
               </CardContent>
             </Card>
-            {/* Notes */}
+
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="dark:text-white">Call Notes</CardTitle>
