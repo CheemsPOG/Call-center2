@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { Session } from "@supabase/supabase-js";
 import {
   Login,
   Dashboard,
@@ -22,23 +24,27 @@ import {
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem("isAuthenticated") === "true";
-  });
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    localStorage.setItem("isAuthenticated", isAuthenticated ? "true" : "false");
-  }, [isAuthenticated]);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    localStorage.setItem("isAuthenticated", "true");
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("isAuthenticated");
-  };
+  const isAuthenticated = !!session;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -50,11 +56,7 @@ const App = () => {
             <Route
               path="/login"
               element={
-                !isAuthenticated ? (
-                  <Login onLogin={handleLogin} />
-                ) : (
-                  <Navigate to="/dashboard" />
-                )
+                !isAuthenticated ? <Login /> : <Navigate to="/dashboard" />
               }
             />
             <Route

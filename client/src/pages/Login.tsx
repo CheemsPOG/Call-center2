@@ -11,12 +11,11 @@ import {
 } from "@/components/ui/card";
 import { Phone, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
-interface LoginProps {
-  onLogin: () => void;
-}
+interface LoginProps {}
 
-const Login = ({ onLogin }: LoginProps) => {
+const Login = ({}: LoginProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,37 +28,47 @@ const Login = ({ onLogin }: LoginProps) => {
     setIsLoading(true);
 
     if (isLogin) {
-      // Login logic
-      setTimeout(() => {
-        if (email && password) {
-          toast.success("Login successful!");
-          onLogin();
-        } else {
-          toast.error("Please enter valid credentials");
-        }
-        setIsLoading(false);
-      }, 1500);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Login successful!");
+      }
     } else {
-      // Signup logic
-      setTimeout(() => {
-        if (email && password && confirmPassword && name) {
-          if (password !== confirmPassword) {
-            toast.error("Passwords do not match");
-            setIsLoading(false);
-            return;
-          }
-          toast.success("Account created successfully!");
-          setIsLogin(true);
-          setEmail("");
-          setPassword("");
-          setConfirmPassword("");
-          setName("");
-        } else {
-          toast.error("Please fill in all fields");
-        }
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
         setIsLoading(false);
-      }, 1500);
+        return;
+      }
+
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          },
+        },
+      });
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success(
+          "Account created successfully! Please check your email to verify."
+        );
+        setIsLogin(true);
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setName("");
+      }
     }
+    setIsLoading(false);
   };
 
   return (
