@@ -15,6 +15,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Search, LifeBuoy, BookOpen, FileQuestion } from "lucide-react";
+import { useState } from "react";
+import { format, isAfter, parseISO } from "date-fns";
+// Import extracted components
+import FAQAccordion from "@/components/faq/FAQAccordion";
+import GuidesList from "@/components/faq/GuidesList";
+import KnowledgeBaseFilters from "@/components/faq/KnowledgeBaseFilters";
+import ArticleCard from "@/components/faq/ArticleCard";
 
 // Mock data for the knowledge base
 const faqs = [
@@ -56,7 +63,142 @@ const guides = [
   },
 ];
 
+// Mock articles data with advanced fields for an online payment service company
+const articles = [
+  {
+    id: 1,
+    title: "How to Issue a Refund",
+    type: "Guide",
+    product: "Merchant Payments",
+    tags: ["refund", "merchant", "transaction"],
+    lastUpdated: "2024-06-01",
+    content: "Step-by-step guide for issuing refunds to customers...",
+  },
+  {
+    id: 2,
+    title: "KYC Verification Script",
+    type: "Script",
+    product: "KYC/Verification",
+    tags: ["kyc", "verification", "compliance"],
+    lastUpdated: "2024-05-28",
+    content: "Script for guiding customers through KYC verification...",
+  },
+  {
+    id: 3,
+    title: "Troubleshooting: Failed Card Payment",
+    type: "Troubleshooting Step",
+    product: "Card Issuing",
+    tags: ["card", "error"],
+    lastUpdated: "2024-06-10",
+    content: "Checklist for resolving failed card payments...",
+  },
+  {
+    id: 4,
+    title: "API Integration FAQ",
+    type: "FAQ",
+    product: "API Integration",
+    tags: ["api", "integration", "developer"],
+    lastUpdated: "2024-06-12",
+    content: "Frequently asked questions about integrating our API...",
+  },
+  {
+    id: 5,
+    title: "Security Policy Update",
+    type: "Policy",
+    product: "Security/Fraud",
+    tags: ["security", "policy", "2fa"],
+    lastUpdated: "2024-06-15",
+    content: "All users must enable 2FA for account security...",
+  },
+  {
+    id: 6,
+    title: "Dispute/Chargeback Handling Guide",
+    type: "Guide",
+    product: "Disputes/Chargebacks",
+    tags: ["dispute", "chargeback", "merchant"],
+    lastUpdated: "2024-06-13",
+    content: "How to handle disputes and chargebacks efficiently...",
+  },
+  {
+    id: 7,
+    title: "Wallet Limits FAQ",
+    type: "FAQ",
+    product: "Wallet",
+    tags: ["limits", "wallet", "policy"],
+    lastUpdated: "2024-06-11",
+    content: "Frequently asked questions about wallet limits...",
+  },
+  {
+    id: 8,
+    title: "Payouts API Troubleshooting",
+    type: "Troubleshooting Step",
+    product: "Payouts",
+    tags: ["payout", "api", "error", "settlement"],
+    lastUpdated: "2024-06-09",
+    content: "Steps to resolve payout API errors and settlement issues...",
+  },
+];
+
+// Only use the streamlined tag set for the tag filter
+const allowedTags = [
+  "refund",
+  "merchant",
+  "transaction",
+  "kyc",
+  "verification",
+  "compliance",
+  "card",
+  "error",
+  "api",
+  "integration",
+  "developer",
+  "security",
+  "policy",
+  "2fa",
+  "dispute",
+  "chargeback",
+  "wallet",
+  "limits",
+  "payout",
+  "settlement",
+  "onboarding",
+];
+const allTags = Array.from(new Set(articles.flatMap((a) => a.tags))).filter(
+  (tag) => allowedTags.includes(tag)
+);
+
 const KnowledgeBase = ({ onLogout }: { onLogout?: () => void }) => {
+  // Search and filter state
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string | "">("");
+  const [productFilter, setProductFilter] = useState<string | "">("");
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const [lastUpdatedFilter, setLastUpdatedFilter] = useState<string>(""); // ISO date string
+
+  // Filtering logic
+  const filteredArticles = articles.filter((a) => {
+    // Search by title/content/tags
+    const searchMatch =
+      !search ||
+      a.title.toLowerCase().includes(search.toLowerCase()) ||
+      a.content.toLowerCase().includes(search.toLowerCase()) ||
+      a.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()));
+    // Type filter
+    const typeMatch = !typeFilter || a.type === typeFilter;
+    // Product filter
+    const productMatch = !productFilter || a.product === productFilter;
+    // Tag filter (all selected tags must be present)
+    const tagMatch =
+      tagFilter.length === 0 || tagFilter.every((t) => a.tags.includes(t));
+    // Last updated filter (show articles updated after selected date)
+    const lastUpdatedMatch =
+      !lastUpdatedFilter ||
+      isAfter(parseISO(a.lastUpdated), parseISO(lastUpdatedFilter));
+    return (
+      searchMatch && typeMatch && productMatch && tagMatch && lastUpdatedMatch
+    );
+  });
+
   return (
     <Layout onLogout={onLogout}>
       <div className="space-y-8">
@@ -71,106 +213,44 @@ const KnowledgeBase = ({ onLogout }: { onLogout?: () => void }) => {
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
-            placeholder="Search for articles, guides, scripts..."
-            className="pl-12 pr-4 py-3 text-base h-12 rounded-lg"
-          />
+        {/* FAQ Section */}
+        <div>
+          <h2 className="text-xl font-semibold mb-2 dark:text-white">
+            Frequently Asked Questions
+          </h2>
+          <FAQAccordion faqs={faqs} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Quick Links */}
-          <Card className="hover:shadow-lg transition-shadow dark:bg-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="dark:text-white">Support Scripts</CardTitle>
-              <BookOpen className="h-6 w-6 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Access approved scripts for various call scenarios.
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="hover:shadow-lg transition-shadow dark:bg-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="dark:text-white">Troubleshooting</CardTitle>
-              <LifeBuoy className="h-6 w-6 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Step-by-step guides to resolve common technical issues.
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="hover:shadow-lg transition-shadow dark:bg-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="dark:text-white">Product FAQs</CardTitle>
-              <FileQuestion className="h-6 w-6 text-yellow-500" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Find answers to frequently asked questions about our products.
-              </p>
-            </CardContent>
-          </Card>
+        {/* Guides Section */}
+        <div>
+          <h2 className="text-xl font-semibold mb-2 dark:text-white">Guides</h2>
+          <GuidesList guides={guides} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* FAQs Section */}
-          <Card className="dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle className="dark:text-white">
-                Frequently Asked Questions
-              </CardTitle>
-              <CardDescription className="dark:text-gray-400">
-                Quick answers to common agent questions.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                {faqs.map((faq, index) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="dark:text-gray-200 hover:no-underline text-left">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="dark:text-gray-300">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </CardContent>
-          </Card>
+        {/* Search Bar & Filters */}
+        <KnowledgeBaseFilters
+          search={search}
+          setSearch={setSearch}
+          typeFilter={typeFilter}
+          setTypeFilter={setTypeFilter}
+          productFilter={productFilter}
+          setProductFilter={setProductFilter}
+          tagFilter={tagFilter}
+          setTagFilter={setTagFilter}
+          allTags={allTags}
+          lastUpdatedFilter={lastUpdatedFilter}
+          setLastUpdatedFilter={setLastUpdatedFilter}
+        />
 
-          {/* Guides Section */}
-          <Card className="dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle className="dark:text-white">Featured Guides</CardTitle>
-              <CardDescription className="dark:text-gray-400">
-                In-depth articles and best practices.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {guides.map((guide, index) => (
-                  <a
-                    href={guide.link}
-                    key={index}
-                    className="block p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                  >
-                    <h4 className="font-semibold dark:text-white">
-                      {guide.title}
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {guide.description}
-                    </p>
-                  </a>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Filtered Results */}
+        <div className="space-y-4">
+          {filteredArticles.length === 0 ? (
+            <div className="text-gray-500 text-center py-8">
+              No articles found.
+            </div>
+          ) : (
+            filteredArticles.map((a) => <ArticleCard key={a.id} article={a} />)
+          )}
         </div>
       </div>
     </Layout>

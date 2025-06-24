@@ -39,6 +39,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useUserProfile } from "@/contexts/UserProfileContext";
 
 interface LayoutProps {
   children: ReactNode;
@@ -57,15 +58,15 @@ interface Notification {
 const Layout = ({ children, onLogout }: LayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [agentStatus, setAgentStatus] = useState("available");
+  const [agentStatus, setAgentStatus] = useState("Available");
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     return savedTheme === "dark";
   });
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [showQuickActions, setShowQuickActions] = useState(false);
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+  const { profileImage } = useUserProfile();
 
   useEffect(() => {
     // Fetch notifications from backend API
@@ -94,6 +95,29 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
       localStorage.setItem("theme", "light");
     }
   }, [isDarkMode]);
+
+  // Fetch agent status from backend on mount
+  useEffect(() => {
+    fetch("http://localhost:4000/agent-status")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status) setAgentStatus(data.status);
+      })
+      .catch(() => setAgentStatus("Available"));
+  }, []);
+
+  // Update agent status in backend and state
+  const handleStatusChange = (status: string) => {
+    fetch("http://localhost:4000/agent-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status) setAgentStatus(data.status);
+      });
+  };
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -163,11 +187,11 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
 
   const getStatusDot = (status: string) => {
     switch (status) {
-      case "available":
+      case "Available":
         return "bg-green-500";
-      case "busy":
+      case "Busy":
         return "bg-yellow-500";
-      case "offline":
+      case "Offline":
         return "bg-gray-500";
       default:
         return "bg-gray-500";
@@ -222,24 +246,38 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+    // Set initial state
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 h-screen transition-transform",
+          "fixed top-0 left-0 z-40 h-screen transition-transform shadow-lg rounded-r-2xl bg-gradient-to-b from-blue-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-r border-gray-200 dark:border-gray-800",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full",
           "w-64 md:w-64 sm:w-56 xs:w-56"
         )}
       >
-        <div className="h-full px-3 py-4 overflow-y-auto bg-white dark:bg-gray-800 w-64 md:w-64 sm:w-56 xs:w-56">
-          <div className="flex items-center justify-between mb-6 bg-blue-600 dark:bg-blue-900 rounded-lg p-2">
-            <div className="flex items-center">
-              <div className="bg-blue-600 dark:bg-blue-900 p-2 rounded-lg">
+        <div className="h-full px-3 py-4 overflow-y-auto w-64 md:w-64 sm:w-56 xs:w-56">
+          <div className="flex items-center justify-between mb-6 bg-blue-600 dark:bg-blue-900 rounded-xl px-2 py-2 shadow-md border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center flex-nowrap">
+              <div className="bg-blue-600 dark:bg-blue-900 p-1 rounded-lg">
                 <Phone className="h-6 w-6 text-white" />
               </div>
-              <span className="ml-3 text-xl font-semibold text-white">
-                Call Center Hub
+              <span className="ml-2 text-lg font-semibold text-white whitespace-nowrap">
+                Call Center Demo
               </span>
             </div>
             <Button
@@ -257,12 +295,12 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group",
+                  "flex items-center p-2 rounded-lg transition-colors duration-200 text-gray-900 dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700 group font-medium",
                   location.pathname === item.path &&
-                    "bg-gray-100 dark:bg-gray-700"
+                    "bg-blue-100 dark:bg-gray-700 shadow-sm border border-blue-200 dark:border-gray-700"
                 )}
               >
-                <item.icon className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                <item.icon className="w-5 h-5 text-blue-500 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-white transition-colors duration-200" />
                 <span className="ml-3">{item.title}</span>
               </Link>
             ))}
@@ -295,27 +333,10 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
       {/* Main Content */}
       <div className="md:ml-64 sm:ml-56 xs:ml-0 ml-0 transition-all duration-300">
         {/* Top Bar */}
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 flex flex-col md:flex-row items-center md:items-stretch justify-between gap-2 md:gap-0 sticky top-0 z-30">
+        <header className="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 md:px-8 py-3 flex flex-col md:flex-row items-center md:items-stretch justify-between gap-2 md:gap-0 sticky top-0 z-30 rounded-b-2xl">
           {/* Top bar left: Quick features instead of search */}
           <div className="flex items-center gap-2 w-full md:w-auto">
-            {/* Quick link to Schedule */}
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 text-blue-600 border-blue-200 dark:border-blue-700 dark:text-blue-400"
-              onClick={() => navigate("/schedule")}
-            >
-              <Calendar className="h-5 w-5" />
-              Schedule
-            </Button>
-            {/* Agent Quick Actions modal trigger */}
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 text-green-600 border-green-200 dark:border-green-700 dark:text-green-400"
-              onClick={() => setShowQuickActions(true)}
-            >
-              <Zap className="h-5 w-5" />
-              Quick Actions
-            </Button>
+            {/* Removed Schedule and Quick Actions buttons */}
           </div>
           {/* Responsive icon/user section spacing */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mt-2 md:mt-0 px-1 sm:px-2 md:px-0 w-full md:w-auto justify-end">
@@ -323,7 +344,7 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg"
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5" />
@@ -436,9 +457,20 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
                   className="relative flex items-center p-0 h-8 w-auto group focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
                   <div className="relative">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">JD</span>
-                    </div>
+                    {/* Show profile image if available, otherwise initials */}
+                    {profileImage ? (
+                      <img
+                        src={profileImage}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">
+                          JD
+                        </span>
+                      </div>
+                    )}
                     {/* Status dot absolutely positioned at bottom right of avatar */}
                     <div
                       className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-gray-800 ${getStatusDot(
@@ -458,19 +490,21 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
                 align="end"
                 className="dark:bg-gray-800 dark:border-gray-700 w-48"
               >
-                <DropdownMenuItem onClick={() => setAgentStatus("available")}>
+                <DropdownMenuItem
+                  onClick={() => handleStatusChange("Available")}
+                >
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 rounded-full bg-green-500" />
                     <span className="dark:text-white">Available</span>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setAgentStatus("busy")}>
+                <DropdownMenuItem onClick={() => handleStatusChange("Busy")}>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 rounded-full bg-yellow-500" />
                     <span className="dark:text-white">Busy</span>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setAgentStatus("offline")}>
+                <DropdownMenuItem onClick={() => handleStatusChange("Offline")}>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 rounded-full bg-gray-500" />
                     <span className="dark:text-white">Offline</span>
@@ -486,47 +520,7 @@ const Layout = ({ children, onLogout }: LayoutProps) => {
           </div>
         </header>
         {/* Agent Quick Actions Modal */}
-        {showQuickActions && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <Card className="w-full max-w-xs p-6 dark:bg-gray-900 dark:border-gray-700">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold dark:text-white">
-                  Agent Quick Actions
-                </h3>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setShowQuickActions(false)}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <div className="flex flex-col gap-3">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => alert("Break requested!")}
-                >
-                  Request Break
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => navigate("/analytics")}
-                >
-                  View My Stats
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => navigate("/settings")}
-                >
-                  Profile Settings
-                </Button>
-              </div>
-            </Card>
-          </div>
-        )}
+        {/* Removed Quick Actions modal/card */}
         {/* Page Content */}
         <main className="p-2 sm:p-4 md:p-6 max-w-full overflow-x-auto min-h-[calc(100vh-64px)]">
           {children}

@@ -32,6 +32,11 @@ import {
   PhoneIncoming,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import StatsGrid from "../components/dashboard/StatsGrid";
+import RecentCalls from "../components/dashboard/RecentCalls";
+import AgentStatus from "../components/dashboard/AgentStatus";
+import QueueStatus from "../components/dashboard/QueueStatus";
+import TransferCallDialog from "../components/dashboard/TransferCallDialog";
 
 interface Agent {
   id: number;
@@ -200,264 +205,28 @@ const Dashboard = ({ onLogout }: { onLogout?: () => void }) => {
         />
 
         {/* Transfer Call Modal */}
-        <Dialog
+        <TransferCallDialog
           open={isTransferModalOpen}
           onOpenChange={setIsTransferModalOpen}
-        >
-          <DialogContent className="dark:bg-gray-800 dark:border-gray-700">
-            <DialogHeader>
-              <DialogTitle className="dark:text-white">
-                Transfer Call
-              </DialogTitle>
-              <DialogDescription className="dark:text-gray-400">
-                Select an available agent to transfer the active call.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Active Call with:{" "}
-                <span className="font-medium text-gray-900 dark:text-white">
-                  Alice Johnson
-                </span>
-              </p>
-              <div className="space-y-2">
-                {availableAgentsForTransfer.length > 0 ? (
-                  availableAgentsForTransfer.map((agent) => (
-                    <div
-                      key={agent.id}
-                      onClick={() => setSelectedAgent(agent.name)}
-                      className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
-                        selectedAgent === agent.name
-                          ? "bg-blue-100 dark:bg-blue-900/50"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm font-medium">
-                            {agent.avatar}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="font-medium dark:text-white">
-                            {agent.name}
-                          </div>
-                        </div>
-                      </div>
-                      <Badge variant={agent.online ? "default" : "secondary"}>
-                        {agent.online ? "Online" : "Offline"}
-                      </Badge>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-                    No available agents to transfer to.
-                  </p>
-                )}
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsTransferModalOpen(false)}
-                className="dark:border-gray-700 dark:hover:bg-gray-700"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleConfirmTransfer}
-                className="bg-blue-600 hover:bg-blue-700"
-                disabled={!selectedAgent}
-              >
-                <PhoneCall className="h-4 w-4 mr-2" />
-                Confirm Transfer
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          availableAgents={availableAgentsForTransfer}
+          selectedAgent={selectedAgent}
+          setSelectedAgent={setSelectedAgent}
+          onConfirm={handleConfirmTransfer}
+        />
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <Card
-                key={stat.title}
-                className="dark:bg-gray-800 dark:border-gray-700"
-              >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                    {stat.title}
-                  </CardTitle>
-                  <Icon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold dark:text-white">
-                    {stat.value}
-                  </div>
-                  <p
-                    className={`text-xs ${
-                      stat.trend === "up"
-                        ? "text-green-600 dark:text-green-400"
-                        : "text-red-600 dark:text-red-400"
-                    }`}
-                  >
-                    {stat.change} from last week
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+        <StatsGrid stats={stats} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Calls */}
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="dark:text-white">Recent Calls</CardTitle>
-              <CardDescription className="dark:text-gray-400">
-                Latest call activity in your center
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentCalls.map((call) => (
-                  <div
-                    key={call.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`p-2 rounded-full ${
-                          call.status === "active"
-                            ? "bg-green-100 dark:bg-green-900/50"
-                            : call.status === "completed"
-                            ? "bg-blue-100 dark:bg-blue-900/50"
-                            : "bg-yellow-100 dark:bg-yellow-900/50"
-                        }`}
-                      >
-                        {call.status === "active" ? (
-                          <PhoneCall className="h-4 w-4 text-green-600 dark:text-green-400" />
-                        ) : call.status === "completed" ? (
-                          <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        ) : (
-                          <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-medium dark:text-white">
-                          {call.customer}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {call.agent} • {call.duration}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge
-                        variant={
-                          call.status === "active"
-                            ? "default"
-                            : call.status === "completed"
-                            ? "secondary"
-                            : "outline"
-                        }
-                      >
-                        {call.status}
-                      </Badge>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {call.type}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <RecentCalls recentCalls={recentCalls} />
 
           {/* Agent Status */}
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="dark:text-white">Agent Status</CardTitle>
-              <CardDescription className="dark:text-gray-400">
-                Current status of your team
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {teamMembers.map((agent) => (
-                  <div
-                    key={agent.id}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
-                          {agent.avatar}
-                        </span>
-                      </div>
-                      <div>
-                        <div className="font-medium dark:text-white">
-                          {agent.name}
-                        </div>
-                      </div>
-                    </div>
-                    <Badge variant={agent.online ? "default" : "secondary"}>
-                      {agent.online ? "Online" : "Offline"}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <AgentStatus teamMembers={teamMembers} />
         </div>
 
         {/* Queue Status */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardHeader>
-            <CardTitle className="dark:text-white">Call Queue Status</CardTitle>
-            <CardDescription className="dark:text-gray-400">
-              Current queue performance metrics
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium dark:text-white">
-                    Queue Length
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    12 calls
-                  </span>
-                </div>
-                <Progress value={60} className="h-2" />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium dark:text-white">
-                    Avg Wait Time
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    3:24
-                  </span>
-                </div>
-                <Progress value={35} className="h-2" />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium dark:text-white">
-                    Service Level
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    87%
-                  </span>
-                </div>
-                <Progress value={87} className="h-2" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <QueueStatus />
       </div>
     </Layout>
   );

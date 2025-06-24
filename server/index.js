@@ -8,10 +8,10 @@ const port = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-const employeeRoutes = require("./routes/employeeRoutes");
+const agentStatusRoutes = require("./routes/agentStatusRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 
-app.use("/employees", employeeRoutes);
+app.use("/agent-status", agentStatusRoutes);
 app.use("/notifications", notificationRoutes);
 
 app.listen(port, () => {

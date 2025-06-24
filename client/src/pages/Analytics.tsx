@@ -32,8 +32,15 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
+// Import extracted analytics components
+import HourlyCallVolume from "@/components/analytics/HourlyCallVolume";
+import CallTypeDistribution from "@/components/analytics/CallTypeDistribution";
+import MyPerformance from "@/components/analytics/MyPerformance";
+import RecentFeedback from "@/components/analytics/RecentFeedback";
+import SlaPerformance from "@/components/analytics/SlaPerformance";
 
 const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
+  // Key metrics for the top grid
   const todayMetrics = [
     {
       title: "Total Calls",
@@ -79,6 +86,7 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
     },
   ];
 
+  // Data for charts and cards
   const hourlyData = [
     { hour: "9 AM", calls: 45, resolved: 38 },
     { hour: "10 AM", calls: 52, resolved: 47 },
@@ -105,21 +113,6 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
     { name: "Billing", value: 30, color: "#EF4444" },
   ];
 
-  const getColorClasses = (color: string) => {
-    const colors = {
-      blue: "text-blue-600 dark:text-blue-400",
-      green: "text-green-600 dark:text-green-400",
-      emerald: "text-emerald-600 dark:text-emerald-400",
-      yellow: "text-yellow-600 dark:text-yellow-400",
-      purple: "text-purple-600 dark:text-purple-400",
-      indigo: "text-indigo-600 dark:text-indigo-400",
-    };
-    return (
-      colors[color as keyof typeof colors] || "text-gray-600 dark:text-gray-400"
-    );
-  };
-
-  // Placeholder for current agent's performance
   const myPerformance = {
     name: "John Doe",
     calls: 28,
@@ -128,7 +121,6 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
     goal: 35,
   };
 
-  // Placeholder for recent feedback
   const recentFeedback = [
     {
       id: 1,
@@ -153,6 +145,21 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
     },
   ];
 
+  // Helper for icon color classes
+  const getColorClasses = (color: string) => {
+    const colors = {
+      blue: "text-blue-600 dark:text-blue-400",
+      green: "text-green-600 dark:text-green-400",
+      emerald: "text-emerald-600 dark:text-emerald-400",
+      yellow: "text-yellow-600 dark:text-yellow-400",
+      purple: "text-purple-600 dark:text-purple-400",
+      indigo: "text-indigo-600 dark:text-indigo-400",
+    };
+    return (
+      colors[color as keyof typeof colors] || "text-gray-600 dark:text-gray-400"
+    );
+  };
+
   return (
     <Layout onLogout={onLogout}>
       <div className="space-y-6">
@@ -165,7 +172,7 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
           </p>
         </div>
 
-        {/* Key Metrics */}
+        {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {todayMetrics.map((metric) => {
             const Icon = metric.icon;
@@ -196,270 +203,20 @@ const Analytics = ({ onLogout }: { onLogout?: () => void }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Hourly Call Volume */}
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="dark:text-white">
-                Hourly Call Volume
-              </CardTitle>
-              <CardDescription className="dark:text-gray-400">
-                Calls received vs resolved today
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={hourlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="hour" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="calls" fill="#3B82F6" name="Received" />
-                  <Bar dataKey="resolved" fill="#10B981" name="Resolved" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Call Types Distribution */}
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="dark:text-white">
-                Call Distribution
-              </CardTitle>
-              <CardDescription className="dark:text-gray-400">
-                Breakdown by call type
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={callTypeData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
-                  >
-                    {callTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          {/* Hourly Call Volume Bar Chart */}
+          <HourlyCallVolume data={hourlyData} />
+          {/* Call Types Pie Chart */}
+          <CallTypeDistribution data={callTypeData} />
         </div>
 
-        {/* My Performance Today */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardHeader>
-            <CardTitle className="dark:text-white">
-              My Performance Today
-            </CardTitle>
-            <CardDescription className="dark:text-gray-400">
-              Your personal stats and progress for today
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-lg font-medium">
-                    {myPerformance.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </span>
-                </div>
-                <div>
-                  <div className="font-medium dark:text-white text-lg">
-                    {myPerformance.name}
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {myPerformance.calls} calls handled
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-8 text-sm">
-                <div className="text-center">
-                  <div className="font-medium dark:text-white">
-                    {myPerformance.avgTime}
-                  </div>
-                  <div className="text-gray-500 dark:text-gray-400">
-                    Avg Time
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="font-medium dark:text-white flex items-center justify-center">
-                    <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                    {myPerformance.satisfaction}
-                  </div>
-                  <div className="text-gray-500 dark:text-gray-400">Rating</div>
-                </div>
-                <div className="text-center">
-                  <Progress
-                    value={(myPerformance.calls / myPerformance.goal) * 100}
-                    className="w-20"
-                  />
-                  <div className="text-gray-500 dark:text-gray-400">
-                    Goal Progress
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* My Performance Card */}
+        <MyPerformance performance={myPerformance} />
 
-        {/* Recent Feedback */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 mt-6">
-          <CardHeader>
-            <CardTitle className="dark:text-white">Recent Feedback</CardTitle>
-            <CardDescription className="dark:text-gray-400">
-              Latest customer feedback for you
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentFeedback.map((fb) => (
-                <div
-                  key={fb.id}
-                  className="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
-                >
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                    {fb.customer
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium dark:text-white">
-                        {fb.customer}
-                      </div>
-                      <div className="text-xs text-gray-400">{fb.time}</div>
-                    </div>
-                    <div className="flex items-center mt-1 mb-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < fb.rating ? "text-yellow-400" : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <div className="text-gray-700 dark:text-gray-200 text-sm">
-                      {fb.comment}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* Fun stat: show how many 5-star feedbacks the agent received today */}
-            <div className="flex items-center justify-between mt-6">
-              <div className="flex items-center space-x-2">
-                <Star className="h-5 w-5 text-yellow-400" />
-                <span className="text-sm text-gray-700 dark:text-gray-200 font-medium">
-                  2 five-star feedbacks today
-                </span>
-              </div>
-              {/* See more feedback link */}
-              <a
-                href="#"
-                className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
-                // In a real app, this would route to a full feedback page
-              >
-                See more feedback
-              </a>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Recent Feedback Card */}
+        <RecentFeedback feedback={recentFeedback} />
 
-        {/* SLA Performance */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-lg dark:text-white">
-                Service Level
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="dark:text-gray-300">
-                      Answered within 30s
-                    </span>
-                    <span className="dark:text-white">92%</span>
-                  </div>
-                  <Progress value={92} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="dark:text-gray-300">Target: 90%</span>
-                    <Badge className="bg-green-100 text-green-800">
-                      Above Target
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-lg dark:text-white">
-                Queue Health
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-sm dark:text-gray-300">
-                    Calls in Queue
-                  </span>
-                  <span className="font-medium dark:text-white">8</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm dark:text-gray-300">
-                    Longest Wait
-                  </span>
-                  <span className="font-medium dark:text-white">2:15</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm dark:text-gray-300">
-                    Avg Wait Time
-                  </span>
-                  <span className="font-medium dark:text-white">0:45</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-lg dark:text-white">Alerts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <AlertCircle className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm dark:text-gray-300">
-                    High queue volume
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm dark:text-gray-300">
-                    All systems operational
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* SLA/Queue/Alerts Grid */}
+        <SlaPerformance />
       </div>
     </Layout>
   );

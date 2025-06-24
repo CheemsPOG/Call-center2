@@ -21,6 +21,7 @@ import {
   Team,
   KnowledgeBase,
 } from "./pages";
+import { UserProfileProvider } from "@/contexts/UserProfileContext";
 
 const queryClient = new QueryClient();
 
@@ -59,143 +60,136 @@ const App = () => {
   const isAuthenticated = !!session;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path="/login"
-              element={
-                !isAuthenticated ? <Login /> : <Navigate to="/dashboard" />
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                isAuthenticated ? (
-                  <Dashboard onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/employees"
-              element={
-                isAuthenticated ? (
-                  <Employees onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/calls"
-              element={
-                isAuthenticated ? (
-                  <CallManagement onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/calls/:id"
-              element={
-                isAuthenticated ? (
-                  <CallDetails onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/tickets"
-              element={
-                isAuthenticated ? (
-                  <TicketManagement onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                isAuthenticated ? (
-                  <Settings onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                isAuthenticated ? (
-                  <Analytics onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/customers/:id"
-              element={
-                isAuthenticated ? (
-                  <CustomerProfile onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/schedule"
-              element={
-                isAuthenticated ? (
-                  <Schedule onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/team"
-              element={
-                isAuthenticated ? (
-                  <Team onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/knowledge-base"
-              element={
-                isAuthenticated ? (
-                  <KnowledgeBase onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/"
-              element={
-                isAuthenticated ? (
-                  <Navigate to="/dashboard" />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <UserProfileProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route
+                path="/login"
+                element={
+                  !isAuthenticated ? <Login /> : <Navigate to="/dashboard" />
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  isAuthenticated ? (
+                    <Dashboard onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/employees"
+                element={
+                  isAuthenticated ? (
+                    <Employees onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/calls"
+                element={
+                  isAuthenticated ? (
+                    <CallManagement onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/calls/:id"
+                element={
+                  isAuthenticated ? (
+                    <CallDetails onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/tickets"
+                element={
+                  isAuthenticated ? (
+                    <TicketManagement onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  isAuthenticated ? (
+                    <Settings onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/analytics"
+                element={
+                  isAuthenticated ? (
+                    <Analytics onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/customers/:id"
+                element={
+                  isAuthenticated ? (
+                    <CustomerProfile onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/schedule"
+                element={
+                  isAuthenticated ? (
+                    <Schedule onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/team"
+                element={
+                  isAuthenticated ? (
+                    <Team onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/knowledge-base"
+                element={
+                  isAuthenticated ? (
+                    <KnowledgeBase onLogout={handleLogout} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route path="/" element={<Navigate to="/login" />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </UserProfileProvider>
   );
 };
 

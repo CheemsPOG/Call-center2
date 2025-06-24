@@ -1,61 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Phone,
-  PhoneCall,
-  Clock,
-  Search,
-  Filter,
-  Play,
-  Pause,
-  Eye,
-  Volume2,
-  Users,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+import CallsTable from "@/components/callmanagement/CallsTable";
+import CallsFilters from "@/components/callmanagement/CallsFilters";
+import NewCallDialog from "@/components/callmanagement/NewCallDialog";
 import { calls } from "@/lib/mockData";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Phone } from "lucide-react";
 
 const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
   const navigate = useNavigate();
@@ -68,6 +21,7 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
   const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
 
+  // Handler for starting a new call
   const handleNewCall = () => {
     // Here you would typically make an API call to initiate the call
     console.log("Initiating call to:", phoneNumber, "Category:", callCategory);
@@ -76,34 +30,7 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
     setCallCategory("support");
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400";
-      case "completed":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-400";
-      case "queued":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-400";
-      case "on-hold":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-400";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-400";
-      case "low":
-        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-    }
-  };
-
+  // Filtering logic
   const filteredCalls = calls
     .filter((call) => filter === "all" || call.status === filter)
     .filter((call) => {
@@ -128,12 +55,39 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
         : priorityFilter.includes(call.priority)
     );
 
+  // Stats for cards (static as in original)
+  const stats = [
+    {
+      label: "Active Calls",
+      value: 2,
+      color: "text-green-600 dark:text-green-400",
+    },
+    {
+      label: "In Queue",
+      value: 1,
+      color: "text-yellow-600 dark:text-yellow-400",
+    },
+    {
+      label: "On Hold",
+      value: 1,
+      color: "text-orange-600 dark:text-orange-400",
+    },
+    { label: "Completed", value: 1, color: "text-blue-600 dark:text-blue-400" },
+    {
+      label: "Avg Wait",
+      value: "3:24",
+      color: "text-gray-900 dark:text-white",
+    },
+  ];
+
+  // Clear all filters
   const clearAllFilters = () => {
     setTypeFilter([]);
     setCategoryFilter([]);
     setPriorityFilter([]);
   };
 
+  // Handle filter checkbox changes
   const handleFilterChange = (
     setter: React.Dispatch<React.SetStateAction<string[]>>,
     value: string,
@@ -142,6 +96,11 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
     setter((prev) =>
       checked ? [...prev, value] : prev.filter((item) => item !== value)
     );
+  };
+
+  // Handler for viewing a call (navigates to details)
+  const handleViewCall = (call) => {
+    navigate(`/calls/${call.id}`, { state: { call } });
   };
 
   return (
@@ -165,90 +124,6 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
             New Call
           </Button>
         </div>
-
-        {/* New Call Dialog */}
-        <Dialog
-          open={isNewCallDialogOpen}
-          onOpenChange={setIsNewCallDialogOpen}
-        >
-          <DialogContent className="dark:bg-gray-800 dark:border-gray-700">
-            <DialogHeader>
-              <DialogTitle className="dark:text-white">
-                Initiate New Call
-              </DialogTitle>
-              <DialogDescription className="dark:text-gray-400">
-                Enter the phone number to start a new outbound call
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="phone"
-                  className="text-sm font-medium dark:text-gray-300"
-                >
-                  Phone Number
-                </label>
-                <Input
-                  id="phone"
-                  placeholder="+1 (555) 000-0000"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <label
-                  htmlFor="category"
-                  className="text-sm font-medium dark:text-gray-300"
-                >
-                  Call Category
-                </label>
-                <Select value={callCategory} onValueChange={setCallCategory}>
-                  <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    <SelectItem
-                      value="support"
-                      className="dark:text-white dark:hover:bg-gray-700"
-                    >
-                      Support
-                    </SelectItem>
-                    <SelectItem
-                      value="sales"
-                      className="dark:text-white dark:hover:bg-gray-700"
-                    >
-                      Sales
-                    </SelectItem>
-                    <SelectItem
-                      value="technical"
-                      className="dark:text-white dark:hover:bg-gray-700"
-                    >
-                      Technical
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsNewCallDialogOpen(false)}
-                className="dark:border-gray-700 dark:hover:bg-gray-700"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleNewCall}
-                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
-                disabled={!phoneNumber}
-              >
-                <PhoneCall className="h-4 w-4 mr-2" />
-                Start Call
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
 
         {/* Call Stats */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -314,153 +189,35 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
           </Card>
         </div>
 
-        {/* Filters */}
+        {/* New Call Dialog */}
+        <NewCallDialog
+          open={isNewCallDialogOpen}
+          onOpenChange={setIsNewCallDialogOpen}
+          phoneNumber={phoneNumber}
+          setPhoneNumber={setPhoneNumber}
+          callCategory={callCategory}
+          setCallCategory={setCallCategory}
+          onStart={handleNewCall}
+          onCancel={() => setIsNewCallDialogOpen(false)}
+        />
+
+        {/* Filters Bar */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="pt-6">
-            <div className="flex gap-4 items-center">
-              <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search by name, phone, or subject..."
-                  className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className="w-40 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                  <SelectItem
-                    value="all"
-                    className="dark:text-white dark:hover:bg-gray-700"
-                  >
-                    All Calls
-                  </SelectItem>
-                  <SelectItem
-                    value="active"
-                    className="dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Active
-                  </SelectItem>
-                  <SelectItem
-                    value="queued"
-                    className="dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Queued
-                  </SelectItem>
-                  <SelectItem
-                    value="on-hold"
-                    className="dark:text-white dark:hover:bg-gray-700"
-                  >
-                    On Hold
-                  </SelectItem>
-                  <SelectItem
-                    value="completed"
-                    className="dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Completed
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="dark:border-gray-700 dark:hover:bg-gray-700"
-                  >
-                    <Filter className="h-4 w-4 mr-2" />
-                    More Filters
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 dark:bg-gray-800 dark:border-gray-700"
-                >
-                  <DropdownMenuLabel>Call Type</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={typeFilter.includes("Inbound")}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange(setTypeFilter, "Inbound", checked)
-                    }
-                  >
-                    Inbound
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={typeFilter.includes("Outbound")}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange(setTypeFilter, "Outbound", checked)
-                    }
-                  >
-                    Outbound
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuLabel>Category</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={categoryFilter.includes("Support")}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange(setCategoryFilter, "Support", checked)
-                    }
-                  >
-                    Support
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={categoryFilter.includes("Sales")}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange(setCategoryFilter, "Sales", checked)
-                    }
-                  >
-                    Sales
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={categoryFilter.includes("Technical")}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange(
-                        setCategoryFilter,
-                        "Technical",
-                        checked
-                      )
-                    }
-                  >
-                    Technical
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuLabel>Priority</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={priorityFilter.includes("high")}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange(setPriorityFilter, "high", checked)
-                    }
-                  >
-                    High
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={priorityFilter.includes("medium")}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange(setPriorityFilter, "medium", checked)
-                    }
-                  >
-                    Medium
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={priorityFilter.includes("low")}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange(setPriorityFilter, "low", checked)
-                    }
-                  >
-                    Low
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={clearAllFilters}
-                    className="text-red-600 dark:text-red-400"
-                  >
-                    Clear Filters
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <CallsFilters
+              filter={filter}
+              setFilter={setFilter}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              typeFilter={typeFilter}
+              setTypeFilter={setTypeFilter}
+              categoryFilter={categoryFilter}
+              setCategoryFilter={setCategoryFilter}
+              priorityFilter={priorityFilter}
+              setPriorityFilter={setPriorityFilter}
+              clearAllFilters={clearAllFilters}
+              handleFilterChange={handleFilterChange}
+            />
             {/* Show active filters as badges */}
             <div className="flex flex-wrap gap-2 mt-4">
               {typeFilter.map((t) => (
@@ -493,123 +250,18 @@ const CallManagement = ({ onLogout }: { onLogout?: () => void }) => {
 
         {/* Calls Table */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardHeader>
-            <CardTitle className="dark:text-white">All Calls</CardTitle>
-            <CardDescription className="dark:text-gray-400">
-              {filteredCalls.length} calls{" "}
-              {filter !== "all" && `(filtered by ${filter})`}
-              {searchQuery && ` matching "${searchQuery}"`}
-            </CardDescription>
-          </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow className="dark:border-gray-700">
-                  <TableHead className="dark:text-gray-300">Call ID</TableHead>
-                  <TableHead className="dark:text-gray-300">Customer</TableHead>
-                  <TableHead className="dark:text-gray-300">
-                    Type & Category
-                  </TableHead>
-                  <TableHead className="dark:text-gray-300">Status</TableHead>
-                  <TableHead className="dark:text-gray-300">Duration</TableHead>
-                  <TableHead className="dark:text-gray-300">Priority</TableHead>
-                  <TableHead className="dark:text-gray-300">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCalls.map((call) => (
-                  <TableRow
-                    key={call.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 dark:border-gray-700"
-                  >
-                    <TableCell className="font-medium dark:text-white">
-                      {call.id}
-                    </TableCell>
-                    <TableCell>
                       <div>
-                        <div
-                          className="font-medium dark:text-white cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
-                          onClick={() =>
-                            navigate(`/customers/${call.customerId}`)
-                          }
-                        >
-                          {call.customer}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {call.customerPhone}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-32">
-                          {call.subject}
-                        </div>
+              <h2 className="text-lg font-semibold mb-4 dark:text-white mt-4">
+                All Calls
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {filteredCalls.length} calls
+                {filter !== "all" && ` (filtered by ${filter})`}
+                {searchQuery && ` matching "${searchQuery}"`}
+              </p>
+              <CallsTable calls={filteredCalls} onView={handleViewCall} />
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium dark:text-white">
-                          {call.type}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {call.category}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={`${getStatusColor(
-                          call.status
-                        )} dark:bg-opacity-20`}
-                      >
-                        {call.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="dark:text-white">
-                      {call.duration}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={`${getPriorityColor(
-                          call.priority
-                        )} dark:bg-opacity-20`}
-                      >
-                        {call.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="dark:hover:bg-gray-700"
-                          onClick={() =>
-                            navigate(`/calls/${call.id}`, { state: { call } })
-                          }
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        {call.status === "active" && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="dark:hover:bg-gray-700"
-                            >
-                              <Pause className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="dark:hover:bg-gray-700"
-                            >
-                              <Volume2 className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
           </CardContent>
         </Card>
       </div>
