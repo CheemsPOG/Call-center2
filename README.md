@@ -19,7 +19,7 @@
 2. **Environment variables:**
 
    - Create a `.env` file in the `server` folder.
-   - Add your Supabase credentials:
+   - Add your Supabase credentials, use the same URL and ANON_KEY from supabase:
      ```env
       VITE_SUPABASE_URL=""
       VITE_SUPABASE_ANON_KEY=""
