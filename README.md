@@ -19,10 +19,12 @@
 2. **Environment variables:**
 
    - Create a `.env` file in the `server` folder.
-   - Add your Supabase credentials:
+   - Add your Supabase credentials, use the same URL and ANON_KEY from supabase:
      ```env
-     SUPABASE_URL=your_supabase_url
-     SUPABASE_ANON_KEY=your_supabase_anon_key
+      VITE_SUPABASE_URL=""
+      VITE_SUPABASE_ANON_KEY=""
+      SUPABASE_URL=""
+      SUPABASE_ANON_KEY=""
      ```
 
 3. **Start the backend server:**
@@ -46,7 +48,7 @@
    ```bash
    npm run dev
    ```
-   - The frontend runs on [http://localhost:5173](http://localhost:5173) by default
+   - The frontend runs on [http://localhost:8080](http://localhost:8080) by default
 
 ---
 
