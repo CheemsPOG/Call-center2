@@ -28,6 +28,10 @@ const queryClient = new QueryClient();
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  // Add guest mode state, initialized from localStorage
+  const [guestMode, setGuestMode] = useState(
+    () => localStorage.getItem("guest_mode") === "true"
+  );
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -42,11 +46,24 @@ const App = () => {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Listen for guest mode changes (e.g., from logout in another tab)
+    const onStorage = () =>
+      setGuestMode(localStorage.getItem("guest_mode") === "true");
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      subscription.unsubscribe();
+    };
   }, []);
+
+  // Allow access if authenticated or in guest mode
+  const isAuthenticatedOrGuest = !!session || guestMode;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    // Clear guest mode on logout
+    localStorage.removeItem("guest_mode");
+    setGuestMode(false);
   };
 
   if (loading) {
@@ -56,8 +73,6 @@ const App = () => {
       </div>
     );
   }
-
-  const isAuthenticated = !!session;
 
   return (
     <UserProfileProvider>
@@ -70,13 +85,17 @@ const App = () => {
               <Route
                 path="/login"
                 element={
-                  !isAuthenticated ? <Login /> : <Navigate to="/dashboard" />
+                  !isAuthenticatedOrGuest ? (
+                    <Login />
+                  ) : (
+                    <Navigate to="/dashboard" />
+                  )
                 }
               />
               <Route
                 path="/dashboard"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <Dashboard onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -86,7 +105,7 @@ const App = () => {
               <Route
                 path="/employees"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <Employees onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -96,7 +115,7 @@ const App = () => {
               <Route
                 path="/calls"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <CallManagement onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -106,7 +125,7 @@ const App = () => {
               <Route
                 path="/calls/:id"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <CallDetails onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -116,7 +135,7 @@ const App = () => {
               <Route
                 path="/tickets"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <TicketManagement onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -126,7 +145,7 @@ const App = () => {
               <Route
                 path="/settings"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <Settings onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -136,7 +155,7 @@ const App = () => {
               <Route
                 path="/analytics"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <Analytics onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -146,7 +165,7 @@ const App = () => {
               <Route
                 path="/customers/:id"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <CustomerProfile onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -156,7 +175,7 @@ const App = () => {
               <Route
                 path="/schedule"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <Schedule onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -166,7 +185,7 @@ const App = () => {
               <Route
                 path="/team"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <Team onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />
@@ -176,7 +195,7 @@ const App = () => {
               <Route
                 path="/knowledge-base"
                 element={
-                  isAuthenticated ? (
+                  isAuthenticatedOrGuest ? (
                     <KnowledgeBase onLogout={handleLogout} />
                   ) : (
                     <Navigate to="/login" />

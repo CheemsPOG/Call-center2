@@ -12,6 +12,7 @@ import {
 import { Phone, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
 
 interface LoginProps {}
 
@@ -22,6 +23,7 @@ const Login = ({}: LoginProps) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate(); // Add navigate for routing
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,6 +161,21 @@ const Login = ({}: LoginProps) => {
                   : "Create Account"}
               </Button>
             </form>
+
+            {/* Add a button to skip login and go to dashboard */}
+            <div className="mt-4 text-center">
+              <Button
+                variant="outline"
+                className="w-full mt-2"
+                onClick={() => {
+                  // Set guest mode and force a hard redirect so the route guard picks up the change immediately
+                  localStorage.setItem("guest_mode", "true");
+                  window.location.href = "/dashboard";
+                }}
+              >
+                Continue as Guest
+              </Button>
+            </div>
 
             <div className="mt-4 text-center">
               <Button
