@@ -49,6 +49,7 @@
    npm run dev
    ```
    - The frontend runs on [http://localhost:8080](http://localhost:8080) by default
+   - For demonstration purposes, you do not need to to run the backend to access the app since the simple backend is just for the notifications and authentication features
 
 ---
 
